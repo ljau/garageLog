@@ -5,6 +5,7 @@ import { Button, Text } from 'react-native-paper';
 
 import { screenContentContainerStyle } from '@/constants/screen';
 import { EmptyState } from '@/components/EmptyState';
+import { ThemedScreen } from '@/components/ThemedScreen';
 import { LoadingState } from '@/components/LoadingState';
 import { StatCard } from '@/components/StatCard';
 import { VehicleCard } from '@/components/VehicleCard';
@@ -57,7 +58,10 @@ export default function DashboardScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={screenContentContainerStyle}>
+    <ThemedScreen>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={screenContentContainerStyle}>
       <Text variant="headlineSmall" style={styles.heading}>
         {t('appName')}
       </Text>
@@ -85,6 +89,7 @@ export default function DashboardScreen() {
 
       {vehicles.length === 0 ? (
         <EmptyState
+          embedded
           title={t('noVehiclesYet')}
           description={t('noVehiclesDescription')}
           actionLabel={t('addVehicle')}
@@ -107,11 +112,15 @@ export default function DashboardScreen() {
         style={styles.addButton}>
         {t('addVehicle')}
       </Button>
-    </ScrollView>
+      </ScrollView>
+    </ThemedScreen>
   );
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+  },
   heading: {
     marginBottom: 16,
   },

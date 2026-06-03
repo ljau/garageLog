@@ -9,11 +9,21 @@ interface EmptyStateProps {
   description: string;
   actionLabel?: string;
   onAction?: () => void;
+  /** When true, omits safe-area wrapper (parent screen already applies insets). */
+  embedded?: boolean;
 }
 
-export function EmptyState({ title, description, actionLabel, onAction }: EmptyStateProps) {
+export function EmptyState({
+  title,
+  description,
+  actionLabel,
+  onAction,
+  embedded = false,
+}: EmptyStateProps) {
+  const Wrapper = embedded ? View : ThemedScreen;
+
   return (
-    <ThemedScreen style={styles.container}>
+    <Wrapper style={styles.container}>
       <Text variant="titleMedium">{title}</Text>
       <MutedText variant="bodyMedium" style={styles.description}>
         {description}
@@ -23,7 +33,7 @@ export function EmptyState({ title, description, actionLabel, onAction }: EmptyS
           {actionLabel}
         </Button>
       ) : null}
-    </ThemedScreen>
+    </Wrapper>
   );
 }
 

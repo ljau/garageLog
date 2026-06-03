@@ -1,6 +1,10 @@
 import type { MD3Theme } from 'react-native-paper';
 import type { ViewStyle } from 'react-native';
 
+export const TAB_BAR_HEIGHT = 56;
+export const FAB_MARGIN = 16;
+export const FAB_HEIGHT = 56;
+
 export const screenContentContainerStyle: ViewStyle = {
   padding: 16,
   paddingBottom: 32,

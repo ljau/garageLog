@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { Card, Divider, List, Text } from 'react-native-paper';
 
 import { EmptyState } from '@/components/EmptyState';
+import { ThemedScreen } from '@/components/ThemedScreen';
 import { LoadingState } from '@/components/LoadingState';
 import { MutedText } from '@/components/MutedText';
 import { StatCard } from '@/components/StatCard';
@@ -41,7 +42,10 @@ export default function ExpenseSummaryScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={screenContentContainerStyle}>
+    <ThemedScreen>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={screenContentContainerStyle}>
       <Text variant="headlineSmall" style={styles.heading}>
         {t('expenseSummary')}
       </Text>
@@ -76,6 +80,7 @@ export default function ExpenseSummaryScreen() {
 
       {!hasAnyExpenses ? (
         <EmptyState
+          embedded
           title={t('noExpensesYet')}
           description={t('noExpensesDescription')}
         />
@@ -103,11 +108,15 @@ export default function ExpenseSummaryScreen() {
           ))}
         </Card>
       )}
-    </ScrollView>
+      </ScrollView>
+    </ThemedScreen>
   );
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+  },
   heading: {
     marginBottom: 16,
   },

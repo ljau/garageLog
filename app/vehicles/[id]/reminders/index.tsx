@@ -6,6 +6,7 @@ import { ThemedScreen } from '@/components/ThemedScreen';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
 import { ReminderCard } from '@/components/ReminderCard';
+import { useFabLayout } from '@/hooks/useFabLayout';
 import { useReminders } from '@/hooks/useReminders';
 import { useVehicle } from '@/hooks/useVehicle';
 import { t } from '@/lib/i18n';
@@ -16,6 +17,7 @@ export default function RemindersScreen() {
   const { vehicle, isLoading: vehicleLoading, error: vehicleError } = useVehicle(id);
   const { reminders, isLoading: remindersLoading, error: remindersError } =
     useReminders(id);
+  const { fabStyle, listPaddingBottom } = useFabLayout();
 
   const isLoading = vehicleLoading || remindersLoading;
   const error = vehicleError ?? remindersError;
@@ -44,11 +46,14 @@ export default function RemindersScreen() {
   return (
     <>
       <Stack.Screen options={{ title: t('reminderHistory') }} />
-      <ThemedScreen>
+      <ThemedScreen edges={['left', 'right']}>
         <FlatList
           data={reminders}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[
+            styles.listContent,
+            { paddingBottom: listPaddingBottom },
+          ]}
           renderItem={({ item }) => (
             <ReminderCard
               reminder={item}
@@ -59,6 +64,7 @@ export default function RemindersScreen() {
           )}
           ListEmptyComponent={
             <EmptyState
+              embedded
               title={t('noRemindersYet')}
               description={t('noRemindersDescription')}
             />
@@ -67,7 +73,7 @@ export default function RemindersScreen() {
 
         <FAB
           icon="plus"
-          style={styles.fab}
+          style={fabStyle}
           onPress={() => router.push(`/vehicles/${vehicle.id}/reminders/add`)}
           label={t('addReminder')}
         />
@@ -79,12 +85,6 @@ export default function RemindersScreen() {
 const styles = StyleSheet.create({
   listContent: {
     padding: 16,
-    paddingBottom: 88,
     flexGrow: 1,
-  },
-  fab: {
-    position: 'absolute',
-    right: 16,
-    bottom: 16,
   },
 });

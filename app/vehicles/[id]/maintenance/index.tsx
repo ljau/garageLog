@@ -6,6 +6,7 @@ import { ThemedScreen } from '@/components/ThemedScreen';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
 import { MaintenanceCard } from '@/components/MaintenanceCard';
+import { useFabLayout } from '@/hooks/useFabLayout';
 import { useMaintenanceRecords } from '@/hooks/useMaintenanceRecords';
 import { useVehicle } from '@/hooks/useVehicle';
 import { t } from '@/lib/i18n';
@@ -16,6 +17,7 @@ export default function MaintenanceHistoryScreen() {
   const { vehicle, isLoading: vehicleLoading, error: vehicleError } = useVehicle(id);
   const { records, isLoading: recordsLoading, error: recordsError } =
     useMaintenanceRecords(id);
+  const { fabStyle, listPaddingBottom } = useFabLayout();
 
   const isLoading = vehicleLoading || recordsLoading;
   const error = vehicleError ?? recordsError;
@@ -44,11 +46,14 @@ export default function MaintenanceHistoryScreen() {
   return (
     <>
       <Stack.Screen options={{ title: t('maintenanceHistory') }} />
-      <ThemedScreen>
+      <ThemedScreen edges={['left', 'right']}>
         <FlatList
           data={records}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[
+            styles.listContent,
+            { paddingBottom: listPaddingBottom },
+          ]}
           renderItem={({ item }) => (
             <MaintenanceCard
               record={item}
@@ -59,6 +64,7 @@ export default function MaintenanceHistoryScreen() {
           )}
           ListEmptyComponent={
             <EmptyState
+              embedded
               title={t('noMaintenanceYet')}
               description={t('noMaintenanceDescription')}
             />
@@ -67,7 +73,7 @@ export default function MaintenanceHistoryScreen() {
 
         <FAB
           icon="plus"
-          style={styles.fab}
+          style={fabStyle}
           onPress={() => router.push(`/vehicles/${vehicle.id}/maintenance/add`)}
           label={t('addMaintenance')}
         />
@@ -79,12 +85,6 @@ export default function MaintenanceHistoryScreen() {
 const styles = StyleSheet.create({
   listContent: {
     padding: 16,
-    paddingBottom: 88,
     flexGrow: 1,
-  },
-  fab: {
-    position: 'absolute',
-    right: 16,
-    bottom: 16,
   },
 });

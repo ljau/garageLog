@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useColorScheme } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import type { ReactNode } from 'react';
 
 import { ThemedRoot } from '@/components/ThemedRoot';
@@ -13,16 +14,18 @@ export function AppProviders({ children }: { children: ReactNode }) {
   const theme = colorScheme === 'dark' ? darkTheme : lightTheme;
 
   return (
-    <DatabaseProvider>
-      <NotificationProvider>
-        <PaperProvider
-          theme={theme}
-          settings={{
-            icon: (props) => <MaterialCommunityIcons {...props} />,
-          }}>
-          <ThemedRoot>{children}</ThemedRoot>
-        </PaperProvider>
-      </NotificationProvider>
-    </DatabaseProvider>
+    <SafeAreaProvider>
+      <DatabaseProvider>
+        <NotificationProvider>
+          <PaperProvider
+            theme={theme}
+            settings={{
+              icon: (props) => <MaterialCommunityIcons {...props} />,
+            }}>
+            <ThemedRoot>{children}</ThemedRoot>
+          </PaperProvider>
+        </NotificationProvider>
+      </DatabaseProvider>
+    </SafeAreaProvider>
   );
 }

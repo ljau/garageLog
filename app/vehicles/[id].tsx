@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Divider, Snackbar, Text } from 'react-native-paper';
 
 import { screenContentContainerStyle } from '@/constants/screen';
+import { ThemedScreen } from '@/components/ThemedScreen';
 import { DeleteVehicleDialog } from '@/components/DeleteVehicleDialog';
 import { MutedText } from '@/components/MutedText';
 import { EmptyState } from '@/components/EmptyState';
@@ -71,7 +72,10 @@ export default function VehicleDetailScreen() {
   return (
     <>
       <Stack.Screen options={{ title: vehicle.nickname }} />
-      <ScrollView contentContainerStyle={screenContentContainerStyle}>
+      <ThemedScreen>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={screenContentContainerStyle}>
         <Text variant="headlineSmall">{vehicle.nickname}</Text>
         <MutedText variant="titleMedium" style={styles.subtitle}>
           {title}
@@ -143,7 +147,8 @@ export default function VehicleDetailScreen() {
             {deleteError}
           </Text>
         ) : null}
-      </ScrollView>
+        </ScrollView>
+      </ThemedScreen>
 
       <DeleteVehicleDialog
         visible={deleteDialogVisible}
@@ -165,6 +170,9 @@ export default function VehicleDetailScreen() {
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+  },
   subtitle: {
     marginTop: 4,
   },
