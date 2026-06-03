@@ -24,6 +24,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="expenses"
+        options={{
+          title: t('expenseSummary'),
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="chart-pie" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="vehicles"
         options={{
           title: t('vehicles'),

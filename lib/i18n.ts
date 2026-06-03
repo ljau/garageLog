@@ -91,6 +91,18 @@ const en = {
   notificationsUnavailableInExpoGo:
     'Local notifications are not available in Expo Go on Android. Reminders are saved; use a development build (npx expo run:android) to receive alerts.',
   reminderPastDue: 'Past due',
+  expenseSummary: 'Expenses',
+  totalExpenses: 'Total expenses',
+  monthlyExpenses: 'This month',
+  yearlyExpenses: 'This year',
+  monthlyExpensesPeriod: 'Based on maintenance in {period}',
+  yearlyExpensesPeriod: 'Calendar year {period}',
+  expensesByVehicle: 'Expenses by vehicle',
+  noExpensesYet: 'No expenses recorded',
+  noExpensesDescription:
+    'Add maintenance records with a cost to see your expense summary here.',
+  noVehicleExpenses: 'No vehicle has logged costs yet.',
+  expenseRecordCount: '{count} records',
 } as const;
 
 type TranslationKey = keyof typeof en;
