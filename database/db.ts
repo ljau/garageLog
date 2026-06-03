@@ -26,6 +26,19 @@ const SCHEMA_SQL = `
     created_at TEXT NOT NULL,
     FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
   );
+  CREATE TABLE IF NOT EXISTS reminders (
+    id TEXT PRIMARY KEY NOT NULL,
+    vehicle_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    scheduled_at TEXT NOT NULL,
+    notification_id TEXT,
+    notes TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
+  );
+  CREATE INDEX IF NOT EXISTS idx_reminders_vehicle_id ON reminders(vehicle_id);
+  CREATE INDEX IF NOT EXISTS idx_reminders_scheduled_at ON reminders(scheduled_at);
 `;
 
 let database: SQLite.SQLiteDatabase | null = null;

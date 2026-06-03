@@ -35,6 +35,19 @@ export function StackNavigator() {
           presentation: 'modal',
         }}
       />
+      <Stack.Screen name="vehicles/[id]/reminders/index" />
+      <Stack.Screen
+        name="vehicles/[id]/reminders/add"
+        options={{
+          presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
+        name="vehicles/[id]/reminders/[reminderId]/edit"
+        options={{
+          presentation: 'modal',
+        }}
+      />
     </Stack>
   );
 }

@@ -56,6 +56,41 @@ const en = {
   mileage: 'Mileage',
   serviceDate: 'Service date',
   notesOptional: 'Notes (optional)',
+  reminders: 'Reminders',
+  reminderHistory: 'Reminders',
+  addReminder: 'Add reminder',
+  editReminder: 'Edit reminder',
+  saveReminder: 'Save reminder',
+  updateReminder: 'Update reminder',
+  reminderSaved: 'Reminder scheduled',
+  reminderUpdated: 'Reminder updated',
+  deleteReminder: 'Delete reminder',
+  deleteReminderTitle: 'Delete reminder?',
+  deleteReminderMessage:
+    'Are you sure you want to delete the {name} reminder? This action cannot be undone.',
+  reminderDeleted: 'Reminder deleted',
+  reminderNotFound: 'Reminder not found',
+  noRemindersYet: 'No reminders yet',
+  noRemindersDescription:
+    'Schedule oil changes, insurance renewals, or tire rotations and get notified when they are due.',
+  viewReminders: 'View reminders',
+  reminderType: 'Reminder type',
+  scheduledDate: 'Date',
+  scheduledTime: 'Time',
+  reminderType_oil_change: 'Oil change',
+  reminderType_insurance_renewal: 'Insurance renewal',
+  reminderType_tire_rotation: 'Tire rotation',
+  reminderNotificationTitle: '{type} reminder',
+  reminderNotificationBody: '{type} for {vehicle} is due soon.',
+  reminderChannelName: 'Garage reminders',
+  reminderMustBeFuture: 'Choose a date and time in the future.',
+  notificationPermissionDenied:
+    'Notification permission is required to schedule reminders. Enable notifications in Settings.',
+  notificationsUnavailableOnWeb:
+    'Local notifications are not available on web. Reminders are saved but will not alert on this platform.',
+  notificationsUnavailableInExpoGo:
+    'Local notifications are not available in Expo Go on Android. Reminders are saved; use a development build (npx expo run:android) to receive alerts.',
+  reminderPastDue: 'Past due',
 } as const;
 
 type TranslationKey = keyof typeof en;

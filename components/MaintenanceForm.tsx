@@ -4,6 +4,7 @@ import { Controller, useForm, type Control, type FieldErrors } from 'react-hook-
 import { StyleSheet } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 
+import { DateTimePickerField } from '@/components/pickers/DateTimePickerField';
 import { t } from '@/lib/i18n';
 import {
   maintenanceFormSchema,
@@ -137,21 +138,16 @@ function MaintenanceFormFields({ control, errors }: MaintenanceFormFieldsProps) 
         control={control}
         name="serviceDate"
         render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            <TextInput
-              label={t('serviceDate')}
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              mode="outlined"
-              placeholder="YYYY-MM-DD"
-              error={!!errors.serviceDate}
-              style={styles.input}
-            />
-            <HelperText type="error" visible={!!errors.serviceDate}>
-              {errors.serviceDate?.message}
-            </HelperText>
-          </>
+          <DateTimePickerField
+            label={t('serviceDate')}
+            mode="date"
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+            error={!!errors.serviceDate}
+            helperText={errors.serviceDate?.message}
+            style={styles.input}
+          />
         )}
       />
 

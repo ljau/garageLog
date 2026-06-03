@@ -116,6 +116,13 @@ export default function VehicleDetailScreen() {
           {t('viewMaintenanceHistory')}
         </Button>
         <Button
+          mode="contained-tonal"
+          icon="bell"
+          onPress={() => router.push(`/vehicles/${vehicle.id}/reminders`)}
+          style={styles.action}>
+          {t('viewReminders')}
+        </Button>
+        <Button
           mode="contained"
           icon="pencil"
           onPress={() => router.push(`/vehicles/${vehicle.id}/edit`)}

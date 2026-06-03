@@ -8,6 +8,7 @@ Offline vehicle garage log built with Expo, TypeScript, and React Native Paper.
 - TypeScript
 - React Native Paper (Material Design 3)
 - Expo SQLite (local persistence)
+- Expo Notifications (local reminders)
 - React Hook Form + Zod
 - Day.js
 
@@ -32,7 +33,12 @@ lib/                    # i18n, formatting helpers
 models/                 # TypeScript domain types
 providers/              # App-wide context (DB, Paper)
 schemas/                # Zod form validation
+lib/notifications.ts    # Local notification scheduling
 ```
+
+## Reminders
+
+Per vehicle, schedule local notifications for oil changes, insurance renewals, and tire rotations. Reminders are stored in SQLite and synced to the OS scheduler on save and app launch. Notifications require permission on iOS and Android. They are not available on web or in **Expo Go on Android** (use `npx expo run:android` for a development build).
 
 ## Localization
 

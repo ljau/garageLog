@@ -3,7 +3,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import { StackNavigator } from '@/app/StackNavigator';
+import { StackNavigator } from '@/components/StackNavigator';
+import { useNotificationObserver } from '@/hooks/useNotificationObserver';
 import { AppProviders } from '@/providers/AppProviders';
 
 export {
@@ -17,6 +18,8 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  useNotificationObserver();
+
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });

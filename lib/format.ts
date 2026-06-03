@@ -8,6 +8,10 @@ export function formatDate(iso: string): string {
   return dayjs(iso).format('MMM D, YYYY');
 }
 
+export function formatDateTime(iso: string): string {
+  return dayjs(iso).format('MMM D, YYYY h:mm A');
+}
+
 export function formatVehicleTitle(brand: string, model: string, year: number): string {
   return `${year} ${brand} ${model}`;
 }

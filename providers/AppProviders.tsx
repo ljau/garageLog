@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { ThemedRoot } from '@/components/ThemedRoot';
 import { darkTheme, lightTheme } from '@/constants/theme';
 import { DatabaseProvider } from '@/providers/DatabaseProvider';
+import { NotificationProvider } from '@/providers/NotificationProvider';
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const colorScheme = useColorScheme();
@@ -13,13 +14,15 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   return (
     <DatabaseProvider>
-      <PaperProvider
-        theme={theme}
-        settings={{
-          icon: (props) => <MaterialCommunityIcons {...props} />,
-        }}>
-        <ThemedRoot>{children}</ThemedRoot>
-      </PaperProvider>
+      <NotificationProvider>
+        <PaperProvider
+          theme={theme}
+          settings={{
+            icon: (props) => <MaterialCommunityIcons {...props} />,
+          }}>
+          <ThemedRoot>{children}</ThemedRoot>
+        </PaperProvider>
+      </NotificationProvider>
     </DatabaseProvider>
   );
 }

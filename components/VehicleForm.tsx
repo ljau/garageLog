@@ -3,6 +3,7 @@ import { Controller, useForm, type Control, type FieldErrors } from 'react-hook-
 import { StyleSheet } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 
+import { DateTimePickerField } from '@/components/pickers/DateTimePickerField';
 import { t } from '@/lib/i18n';
 import {
   parseIntegerField,
@@ -147,21 +148,16 @@ function VehicleFormFields({ control, errors }: VehicleFormFieldsProps) {
         control={control}
         name="year"
         render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            <TextInput
-              label={t('year')}
-              value={String(value)}
-              onChangeText={(text) => onChange(parseIntegerField(text, value))}
-              onBlur={onBlur}
-              mode="outlined"
-              keyboardType="number-pad"
-              error={!!errors.year}
-              style={styles.input}
-            />
-            <HelperText type="error" visible={!!errors.year}>
-              {errors.year?.message}
-            </HelperText>
-          </>
+          <DateTimePickerField
+            label={t('year')}
+            mode="year"
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+            error={!!errors.year}
+            helperText={errors.year?.message}
+            style={styles.input}
+          />
         )}
       />
 
