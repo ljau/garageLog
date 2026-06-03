@@ -1,9 +1,9 @@
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
+import { StackNavigator } from '@/app/StackNavigator';
 import { AppProviders } from '@/providers/AppProviders';
 
 export {
@@ -37,22 +37,7 @@ export default function RootLayout() {
 
   return (
     <AppProviders>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="vehicles/add"
-          options={{
-            presentation: 'modal',
-          }}
-        />
-        <Stack.Screen name="vehicles/[id]" />
-        <Stack.Screen
-          name="vehicles/[id]/edit"
-          options={{
-            presentation: 'modal',
-          }}
-        />
-      </Stack>
+      <StackNavigator />
     </AppProviders>
   );
 }

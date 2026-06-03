@@ -1,6 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 
+import { MutedText } from '@/components/MutedText';
+import { ThemedScreen } from '@/components/ThemedScreen';
+
 interface EmptyStateProps {
   title: string;
   description: string;
@@ -10,17 +13,17 @@ interface EmptyStateProps {
 
 export function EmptyState({ title, description, actionLabel, onAction }: EmptyStateProps) {
   return (
-    <View style={styles.container}>
+    <ThemedScreen style={styles.container}>
       <Text variant="titleMedium">{title}</Text>
-      <Text variant="bodyMedium" style={styles.description}>
+      <MutedText variant="bodyMedium" style={styles.description}>
         {description}
-      </Text>
+      </MutedText>
       {actionLabel && onAction ? (
         <Button mode="contained" onPress={onAction} style={styles.button}>
           {actionLabel}
         </Button>
       ) : null}
-    </View>
+    </ThemedScreen>
   );
 }
 
@@ -34,7 +37,6 @@ const styles = StyleSheet.create({
   description: {
     marginTop: 8,
     textAlign: 'center',
-    opacity: 0.7,
   },
   button: {
     marginTop: 20,

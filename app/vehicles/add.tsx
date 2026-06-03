@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { Snackbar } from 'react-native-paper';
 
+import { ThemedScreen } from '@/components/ThemedScreen';
 import { VehicleForm } from '@/components/VehicleForm';
+import { screenContentContainerStyle } from '@/constants/screen';
 import { insertVehicle } from '@/database/vehicleRepository';
 import { t } from '@/lib/i18n';
 import { useDatabase } from '@/providers/DatabaseProvider';
@@ -45,22 +47,26 @@ export default function AddVehicleScreen() {
   return (
     <>
       <Stack.Screen options={{ title: t('addVehicle') }} />
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ThemedScreen>
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <ScrollView
+            contentContainerStyle={screenContentContainerStyle}
+            keyboardShouldPersistTaps="handled">
           <VehicleForm
             defaultValues={defaultValues}
             submitLabel={t('saveVehicle')}
             onSubmit={onSubmit}
             submitError={submitError}
           />
-        </ScrollView>
+          </ScrollView>
 
-        <Snackbar visible={snackbarVisible} onDismiss={() => setSnackbarVisible(false)}>
-          {t('vehicleSaved')}
-        </Snackbar>
-      </KeyboardAvoidingView>
+          <Snackbar visible={snackbarVisible} onDismiss={() => setSnackbarVisible(false)}>
+            {t('vehicleSaved')}
+          </Snackbar>
+        </KeyboardAvoidingView>
+      </ThemedScreen>
     </>
   );
 }
@@ -68,9 +74,5 @@ export default function AddVehicleScreen() {
 const styles = StyleSheet.create({
   flex: {
     flex: 1,
-  },
-  container: {
-    padding: 16,
-    paddingBottom: 32,
   },
 });

@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Divider, Snackbar, Text } from 'react-native-paper';
 
+import { screenContentContainerStyle } from '@/constants/screen';
 import { DeleteVehicleDialog } from '@/components/DeleteVehicleDialog';
+import { MutedText } from '@/components/MutedText';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
 import { deleteVehicle } from '@/database/vehicleRepository';
@@ -69,43 +71,50 @@ export default function VehicleDetailScreen() {
   return (
     <>
       <Stack.Screen options={{ title: vehicle.nickname }} />
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={screenContentContainerStyle}>
         <Text variant="headlineSmall">{vehicle.nickname}</Text>
-        <Text variant="titleMedium" style={styles.subtitle}>
+        <MutedText variant="titleMedium" style={styles.subtitle}>
           {title}
-        </Text>
+        </MutedText>
 
         <Divider style={styles.divider} />
 
         <View style={styles.detailRow}>
-          <Text variant="labelLarge">{t('brand')}</Text>
+          <MutedText variant="labelLarge">{t('brand')}</MutedText>
           <Text variant="bodyLarge">{vehicle.brand}</Text>
         </View>
         <View style={styles.detailRow}>
-          <Text variant="labelLarge">{t('model')}</Text>
+          <MutedText variant="labelLarge">{t('model')}</MutedText>
           <Text variant="bodyLarge">{vehicle.model}</Text>
         </View>
         <View style={styles.detailRow}>
-          <Text variant="labelLarge">{t('year')}</Text>
+          <MutedText variant="labelLarge">{t('year')}</MutedText>
           <Text variant="bodyLarge">{String(vehicle.year)}</Text>
         </View>
         <View style={styles.detailRow}>
-          <Text variant="labelLarge">{t('currentMileage')}</Text>
+          <MutedText variant="labelLarge">{t('currentMileage')}</MutedText>
           <Text variant="bodyLarge">
             {formatMileage(vehicle.currentMileage)} {t('mileageUnit')}
           </Text>
         </View>
         {vehicle.plateNumber ? (
           <View style={styles.detailRow}>
-            <Text variant="labelLarge">{t('plateNumber')}</Text>
+            <MutedText variant="labelLarge">{t('plateNumber')}</MutedText>
             <Text variant="bodyLarge">{vehicle.plateNumber}</Text>
           </View>
         ) : null}
         <View style={styles.detailRow}>
-          <Text variant="labelLarge">{t('addedOn')}</Text>
+          <MutedText variant="labelLarge">{t('addedOn')}</MutedText>
           <Text variant="bodyLarge">{formatDate(vehicle.createdAt)}</Text>
         </View>
 
+        <Button
+          mode="contained-tonal"
+          icon="wrench"
+          onPress={() => router.push(`/vehicles/${vehicle.id}/maintenance`)}
+          style={styles.action}>
+          {t('viewMaintenanceHistory')}
+        </Button>
         <Button
           mode="contained"
           icon="pencil"
@@ -149,13 +158,8 @@ export default function VehicleDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    paddingBottom: 32,
-  },
   subtitle: {
     marginTop: 4,
-    opacity: 0.8,
   },
   divider: {
     marginVertical: 16,

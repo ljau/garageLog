@@ -1,6 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 
+import { MutedText } from '@/components/MutedText';
+
 import { formatMileage, formatVehicleTitle } from '@/lib/format';
 import { t } from '@/lib/i18n';
 import type { Vehicle } from '@/models/vehicle';
@@ -17,15 +19,15 @@ export function VehicleCard({ vehicle, onPress }: VehicleCardProps) {
     <Card style={styles.card} onPress={onPress}>
       <Card.Content>
         <Text variant="titleMedium">{vehicle.nickname}</Text>
-        <Text variant="bodyMedium" style={styles.subtitle}>
+        <MutedText variant="bodyMedium" style={styles.subtitle}>
           {title}
-        </Text>
+        </MutedText>
         <View style={styles.metaRow}>
-          <Text variant="bodySmall">
+          <MutedText variant="bodySmall">
             {formatMileage(vehicle.currentMileage)} {t('mileageUnit')}
-          </Text>
+          </MutedText>
           {vehicle.plateNumber ? (
-            <Text variant="bodySmall">{vehicle.plateNumber}</Text>
+            <MutedText variant="bodySmall">{vehicle.plateNumber}</MutedText>
           ) : null}
         </View>
       </Card.Content>
@@ -39,7 +41,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     marginTop: 4,
-    opacity: 0.8,
   },
   metaRow: {
     flexDirection: 'row',

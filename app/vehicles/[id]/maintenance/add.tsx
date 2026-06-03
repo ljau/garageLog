@@ -4,17 +4,17 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-na
 import { Snackbar } from 'react-native-paper';
 
 import { ThemedScreen } from '@/components/ThemedScreen';
-import { EmptyState } from '@/components/EmptyState';
 import { screenContentContainerStyle } from '@/constants/screen';
+import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
-import { VehicleForm, vehicleToFormValues } from '@/components/VehicleForm';
-import { updateVehicle } from '@/database/vehicleRepository';
+import { defaultMaintenanceFormValues, MaintenanceForm } from '@/components/MaintenanceForm';
+import { insertMaintenanceRecord } from '@/database/maintenanceRepository';
 import { useVehicle } from '@/hooks/useVehicle';
 import { t } from '@/lib/i18n';
 import { useDatabase } from '@/providers/DatabaseProvider';
-import type { VehicleFormValues } from '@/schemas/vehicleForm';
+import type { MaintenanceFormValues } from '@/schemas/maintenanceForm';
 
-export default function EditVehicleScreen() {
+export default function AddMaintenanceScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { refresh, isReady } = useDatabase();
@@ -22,7 +22,7 @@ export default function EditVehicleScreen() {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const onSubmit = async (values: VehicleFormValues) => {
+  const onSubmit = async (values: MaintenanceFormValues) => {
     if (!isReady || !vehicle) {
       setSubmitError(t('databaseError'));
       return;
@@ -31,7 +31,7 @@ export default function EditVehicleScreen() {
     setSubmitError(null);
 
     try {
-      await updateVehicle(vehicle.id, values);
+      await insertMaintenanceRecord(vehicle.id, values);
       refresh();
       setSnackbarVisible(true);
       setTimeout(() => router.back(), 600);
@@ -43,7 +43,7 @@ export default function EditVehicleScreen() {
   if (isLoading) {
     return (
       <>
-        <Stack.Screen options={{ title: t('editVehicle') }} />
+        <Stack.Screen options={{ title: t('addMaintenance') }} />
         <LoadingState />
       </>
     );
@@ -52,7 +52,7 @@ export default function EditVehicleScreen() {
   if (error || !vehicle) {
     return (
       <>
-        <Stack.Screen options={{ title: t('editVehicle') }} />
+        <Stack.Screen options={{ title: t('addMaintenance') }} />
         <EmptyState
           title={t('vehicleNotFound')}
           description={error?.message ?? t('vehicleNotFound')}
@@ -63,7 +63,7 @@ export default function EditVehicleScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: t('editVehicle') }} />
+      <Stack.Screen options={{ title: t('addMaintenance') }} />
       <ThemedScreen>
         <KeyboardAvoidingView
           style={styles.flex}
@@ -71,17 +71,16 @@ export default function EditVehicleScreen() {
           <ScrollView
             contentContainerStyle={screenContentContainerStyle}
             keyboardShouldPersistTaps="handled">
-          <VehicleForm
-            key={vehicle.id}
-            defaultValues={vehicleToFormValues(vehicle)}
-            submitLabel={t('updateVehicle')}
+          <MaintenanceForm
+            defaultValues={defaultMaintenanceFormValues(vehicle.currentMileage)}
+            submitLabel={t('saveMaintenance')}
             onSubmit={onSubmit}
             submitError={submitError}
           />
           </ScrollView>
 
           <Snackbar visible={snackbarVisible} onDismiss={() => setSnackbarVisible(false)}>
-            {t('vehicleUpdated')}
+            {t('maintenanceSaved')}
           </Snackbar>
         </KeyboardAvoidingView>
       </ThemedScreen>

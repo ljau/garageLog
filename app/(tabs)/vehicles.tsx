@@ -1,7 +1,8 @@
 import { useRouter } from 'expo-router';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet } from 'react-native';
 import { FAB } from 'react-native-paper';
 
+import { ThemedScreen } from '@/components/ThemedScreen';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
 import { VehicleCard } from '@/components/VehicleCard';
@@ -23,7 +24,7 @@ export default function VehiclesScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ThemedScreen>
       <FlatList
         data={vehicles}
         keyExtractor={(item) => item.id}
@@ -51,14 +52,11 @@ export default function VehiclesScreen() {
         onPress={() => router.push('/vehicles/add')}
         label={t('addVehicle')}
       />
-    </View>
+    </ThemedScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   list: {
     padding: 16,
     paddingBottom: 88,

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 
+import { screenContentContainerStyle } from '@/constants/screen';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
 import { StatCard } from '@/components/StatCard';
@@ -56,7 +57,7 @@ export default function DashboardScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={screenContentContainerStyle}>
       <Text variant="headlineSmall" style={styles.heading}>
         {t('appName')}
       </Text>
@@ -111,10 +112,6 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    paddingBottom: 32,
-  },
   heading: {
     marginBottom: 16,
   },

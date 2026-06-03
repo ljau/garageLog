@@ -14,6 +14,18 @@ const SCHEMA_SQL = `
     current_mileage INTEGER NOT NULL,
     created_at TEXT NOT NULL
   );
+  CREATE TABLE IF NOT EXISTS maintenance_records (
+    id TEXT PRIMARY KEY NOT NULL,
+    vehicle_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    description TEXT NOT NULL,
+    cost REAL,
+    mileage INTEGER NOT NULL,
+    service_date TEXT NOT NULL,
+    notes TEXT,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
+  );
 `;
 
 let database: SQLite.SQLiteDatabase | null = null;

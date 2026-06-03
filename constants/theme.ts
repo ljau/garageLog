@@ -20,6 +20,8 @@ export const lightTheme: MD3Theme = {
   colors: {
     ...MD3LightTheme.colors,
     ...sharedColors,
+    onSurfaceVariant: '#424242',
+    outline: '#616161',
     primaryContainer: '#BBDEFB',
     secondaryContainer: '#CFD8DC',
   },
@@ -31,6 +33,8 @@ export const darkTheme: MD3Theme = {
   colors: {
     ...MD3DarkTheme.colors,
     ...sharedColors,
+    onSurfaceVariant: '#E8E8E8',
+    outline: '#BDBDBD',
     primary: '#90CAF9',
     primaryContainer: '#0D47A1',
     secondaryContainer: '#37474F',

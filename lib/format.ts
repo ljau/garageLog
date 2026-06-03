@@ -11,3 +11,7 @@ export function formatDate(iso: string): string {
 export function formatVehicleTitle(brand: string, model: string, year: number): string {
   return `${year} ${brand} ${model}`;
 }
+
+export function formatCost(value: number): string {
+  return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+}

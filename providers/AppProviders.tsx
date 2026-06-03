@@ -3,6 +3,7 @@ import { useColorScheme } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import type { ReactNode } from 'react';
 
+import { ThemedRoot } from '@/components/ThemedRoot';
 import { darkTheme, lightTheme } from '@/constants/theme';
 import { DatabaseProvider } from '@/providers/DatabaseProvider';
 
@@ -17,7 +18,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
         settings={{
           icon: (props) => <MaterialCommunityIcons {...props} />,
         }}>
-        {children}
+        <ThemedRoot>{children}</ThemedRoot>
       </PaperProvider>
     </DatabaseProvider>
   );
