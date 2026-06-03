@@ -45,6 +45,13 @@ export default function RootLayout() {
             presentation: 'modal',
           }}
         />
+        <Stack.Screen name="vehicles/[id]" />
+        <Stack.Screen
+          name="vehicles/[id]/edit"
+          options={{
+            presentation: 'modal',
+          }}
+        />
       </Stack>
     </AppProviders>
   );

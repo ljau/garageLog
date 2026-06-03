@@ -18,6 +18,19 @@ const en = {
   currentMileage: 'Current mileage',
   saveVehicle: 'Save vehicle',
   vehicleSaved: 'Vehicle saved',
+  editVehicle: 'Edit vehicle',
+  vehicleDetails: 'Vehicle details',
+  updateVehicle: 'Update vehicle',
+  vehicleUpdated: 'Vehicle updated',
+  deleteVehicle: 'Delete vehicle',
+  deleteVehicleTitle: 'Delete vehicle?',
+  deleteVehicleMessage: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
+  vehicleDeleted: 'Vehicle deleted',
+  vehicleNotFound: 'Vehicle not found',
+  cancel: 'Cancel',
+  delete: 'Delete',
+  edit: 'Edit',
+  addedOn: 'Added on',
   loading: 'Loading…',
   databaseError: 'Could not load data. Please restart the app.',
   mileageUnit: 'km',
@@ -39,8 +52,14 @@ export function getLocale(): Locale {
   return locale;
 }
 
-export function t(key: TranslationKey): string {
-  return catalogs[locale][key];
+export function t(key: TranslationKey, params?: Record<string, string>): string {
+  let text: string = catalogs[locale][key];
+  if (params) {
+    for (const [paramKey, value] of Object.entries(params)) {
+      text = text.replace(`{${paramKey}}`, value);
+    }
+  }
+  return text;
 }
 
 export type { TranslationKey };

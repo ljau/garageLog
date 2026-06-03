@@ -42,6 +42,15 @@ export async function insertVehicle(input: VehicleFormValues): Promise<Vehicle> 
   };
 }
 
+export async function getVehicleById(id: string): Promise<Vehicle | null> {
+  const db = await getDatabase();
+  const row = await db.getFirstAsync<VehicleRow>(
+    `SELECT * FROM vehicles WHERE id = ?`,
+    id,
+  );
+  return row ? rowToVehicle(row) : null;
+}
+
 export async function getAllVehicles(): Promise<Vehicle[]> {
   const db = await getDatabase();
   const rows = await db.getAllAsync<VehicleRow>(
@@ -57,6 +66,56 @@ export async function getRecentVehicles(limit: number): Promise<Vehicle[]> {
     limit,
   );
   return rows.map(rowToVehicle);
+}
+
+export async function updateVehicle(
+  id: string,
+  input: VehicleFormValues,
+): Promise<Vehicle> {
+  const db = await getDatabase();
+  const plateNumber = input.plateNumber?.trim() || null;
+
+  const result = await db.runAsync(
+    `UPDATE vehicles SET
+      nickname = ?,
+      brand = ?,
+      model = ?,
+      year = ?,
+      plate_number = ?,
+      current_mileage = ?
+    WHERE id = ?`,
+    input.nickname.trim(),
+    input.brand.trim(),
+    input.model.trim(),
+    input.year,
+    plateNumber,
+    input.currentMileage,
+    id,
+  );
+
+  if (result.changes === 0) {
+    throw new Error('Vehicle not found');
+  }
+
+  const row = await db.getFirstAsync<VehicleRow>(
+    `SELECT * FROM vehicles WHERE id = ?`,
+    id,
+  );
+
+  if (!row) {
+    throw new Error('Vehicle not found');
+  }
+
+  return rowToVehicle(row);
+}
+
+export async function deleteVehicle(id: string): Promise<void> {
+  const db = await getDatabase();
+  const result = await db.runAsync(`DELETE FROM vehicles WHERE id = ?`, id);
+
+  if (result.changes === 0) {
+    throw new Error('Vehicle not found');
+  }
 }
 
 export async function getVehicleStats(): Promise<VehicleStats> {

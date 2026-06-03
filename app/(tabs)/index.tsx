@@ -90,7 +90,13 @@ export default function DashboardScreen() {
           onAction={goToAddVehicle}
         />
       ) : (
-        vehicles.map((vehicle) => <VehicleCard key={vehicle.id} vehicle={vehicle} />)
+        vehicles.map((vehicle) => (
+          <VehicleCard
+            key={vehicle.id}
+            vehicle={vehicle}
+            onPress={() => router.push(`/vehicles/${vehicle.id}`)}
+          />
+        ))
       )}
 
       <Button

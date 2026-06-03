@@ -30,7 +30,12 @@ export default function VehiclesScreen() {
         contentContainerStyle={
           vehicles.length === 0 ? styles.emptyList : styles.list
         }
-        renderItem={({ item }) => <VehicleCard vehicle={item} />}
+        renderItem={({ item }) => (
+          <VehicleCard
+            vehicle={item}
+            onPress={() => router.push(`/vehicles/${item.id}`)}
+          />
+        )}
         ListEmptyComponent={
           <EmptyState
             title={t('noVehiclesYet')}
