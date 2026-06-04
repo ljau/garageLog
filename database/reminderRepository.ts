@@ -7,6 +7,7 @@ import {
   cancelReminderNotification,
   scheduleReminderNotification,
 } from '@/lib/notifications';
+import { formatVehicleDisplayName } from '@/lib/format';
 import {
   rowToReminder,
   type Reminder,
@@ -76,7 +77,10 @@ export async function insertReminder(
     updatedAt: now,
   };
 
-  const notificationId = await scheduleAndPersistNotification(reminder, vehicle.nickname);
+  const notificationId = await scheduleAndPersistNotification(
+    reminder,
+    formatVehicleDisplayName(vehicle),
+  );
   return { ...reminder, notificationId, updatedAt: dayjs().toISOString() };
 }
 
@@ -130,7 +134,10 @@ export async function updateReminder(
     updatedAt,
   };
 
-  const notificationId = await scheduleAndPersistNotification(reminder, vehicle.nickname);
+  const notificationId = await scheduleAndPersistNotification(
+    reminder,
+    formatVehicleDisplayName(vehicle),
+  );
   return { ...reminder, notificationId };
 }
 
@@ -188,6 +195,6 @@ export async function syncScheduledReminderNotifications(): Promise<void> {
     }
 
     await cancelReminderNotification(reminder.notificationId);
-    await scheduleAndPersistNotification(reminder, vehicle.nickname);
+    await scheduleAndPersistNotification(reminder, formatVehicleDisplayName(vehicle));
   }
 }

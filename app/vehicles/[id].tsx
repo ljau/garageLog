@@ -1,7 +1,8 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Divider, Snackbar, Text } from 'react-native-paper';
+import { Button, Divider, Snackbar, Text, useTheme } from 'react-native-paper';
 
 import { screenContentContainerStyle } from '@/constants/screen';
 import { ThemedScreen } from '@/components/ThemedScreen';
@@ -11,11 +12,13 @@ import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
 import { deleteVehicle } from '@/database/vehicleRepository';
 import { useVehicle } from '@/hooks/useVehicle';
-import { formatDate, formatMileage, formatVehicleTitle } from '@/lib/format';
+import { formatDate, formatMileage, formatVehicleDisplayName, formatVehicleTitle } from '@/lib/format';
 import { t } from '@/lib/i18n';
+import { vehicleCategoryIcon, vehicleCategoryLabel } from '@/lib/vehicles';
 import { useDatabase } from '@/providers/DatabaseProvider';
 
 export default function VehicleDetailScreen() {
+  const theme = useTheme();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { refresh, isReady } = useDatabase();
@@ -68,21 +71,41 @@ export default function VehicleDetailScreen() {
   }
 
   const title = formatVehicleTitle(vehicle.brand, vehicle.model, vehicle.year);
+  const displayName = formatVehicleDisplayName(vehicle);
+  const hasNickname = !!vehicle.nickname?.trim();
+  const categoryIcon = vehicleCategoryIcon(
+    vehicle.category,
+  ) as keyof typeof MaterialCommunityIcons.glyphMap;
 
   return (
     <>
-      <Stack.Screen options={{ title: vehicle.nickname }} />
+      <Stack.Screen options={{ title: displayName }} />
       <ThemedScreen>
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={screenContentContainerStyle}>
-        <Text variant="headlineSmall">{vehicle.nickname}</Text>
-        <MutedText variant="titleMedium" style={styles.subtitle}>
-          {title}
-        </MutedText>
+        <Text variant="headlineSmall">{displayName}</Text>
+        {hasNickname ? (
+          <MutedText variant="titleMedium" style={styles.subtitle}>
+            {title}
+          </MutedText>
+        ) : null}
 
         <Divider style={styles.divider} />
 
+        <View style={styles.detailRow}>
+          <MutedText variant="labelLarge">{t('vehicleCategory')}</MutedText>
+          <View style={styles.categoryValue}>
+            <MaterialCommunityIcons
+              name={categoryIcon}
+              size={20}
+              color={theme.colors.primary}
+            />
+            <Text variant="bodyLarge" style={styles.categoryLabel}>
+              {vehicleCategoryLabel(vehicle.category)}
+            </Text>
+          </View>
+        </View>
         <View style={styles.detailRow}>
           <MutedText variant="labelLarge">{t('brand')}</MutedText>
           <Text variant="bodyLarge">{vehicle.brand}</Text>
@@ -152,7 +175,7 @@ export default function VehicleDetailScreen() {
 
       <DeleteVehicleDialog
         visible={deleteDialogVisible}
-        vehicleName={vehicle.nickname}
+        vehicleName={displayName}
         isDeleting={isDeleting}
         onConfirm={handleDelete}
         onDismiss={() => {
@@ -184,6 +207,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
+  },
+  categoryValue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  categoryLabel: {
+    marginLeft: 6,
   },
   action: {
     marginTop: 12,

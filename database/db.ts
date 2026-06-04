@@ -10,6 +10,7 @@ const SCHEMA_SQL = `
     brand TEXT NOT NULL,
     model TEXT NOT NULL,
     year INTEGER NOT NULL,
+    category TEXT NOT NULL DEFAULT 'car',
     plate_number TEXT,
     current_mileage INTEGER NOT NULL,
     created_at TEXT NOT NULL
@@ -43,6 +44,17 @@ const SCHEMA_SQL = `
 
 let database: SQLite.SQLiteDatabase | null = null;
 
+async function migrateDatabase(db: SQLite.SQLiteDatabase): Promise<void> {
+  const columns = await db.getAllAsync<{ name: string }>(`PRAGMA table_info(vehicles)`);
+  const hasCategory = columns.some((column) => column.name === 'category');
+
+  if (!hasCategory) {
+    await db.execAsync(
+      `ALTER TABLE vehicles ADD COLUMN category TEXT NOT NULL DEFAULT 'car';`,
+    );
+  }
+}
+
 export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
   if (database) {
     return database;
@@ -50,6 +62,7 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
 
   const db = await SQLite.openDatabaseAsync(DATABASE_NAME);
   await db.execAsync(SCHEMA_SQL);
+  await migrateDatabase(db);
   database = db;
   return db;
 }

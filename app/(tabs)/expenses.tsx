@@ -10,7 +10,7 @@ import { MutedText } from '@/components/MutedText';
 import { StatCard } from '@/components/StatCard';
 import { screenContentContainerStyle } from '@/constants/screen';
 import { useExpenseSummary } from '@/hooks/useExpenseSummary';
-import { formatCost, formatVehicleTitle } from '@/lib/format';
+import { formatCost, formatVehicleDisplayName, formatVehicleTitle } from '@/lib/format';
 import { t } from '@/lib/i18n';
 import { useDatabase } from '@/providers/DatabaseProvider';
 
@@ -92,8 +92,12 @@ export default function ExpenseSummaryScreen() {
             <View key={item.vehicleId}>
               {index > 0 ? <Divider /> : null}
               <List.Item
-                title={item.nickname}
-                description={formatVehicleTitle(item.brand, item.model, item.year)}
+                title={formatVehicleDisplayName(item)}
+                description={
+                  item.nickname?.trim()
+                    ? formatVehicleTitle(item.brand, item.model, item.year)
+                    : undefined
+                }
                 onPress={() => router.push(`/vehicles/${item.vehicleId}/maintenance`)}
                 right={() => (
                   <View style={styles.listAmount}>

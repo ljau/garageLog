@@ -1,10 +1,12 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
-import { Card, Text } from 'react-native-paper';
+import { Card, Text, useTheme } from 'react-native-paper';
 
 import { MutedText } from '@/components/MutedText';
 
-import { formatMileage, formatVehicleTitle } from '@/lib/format';
+import { formatMileage, formatVehicleDisplayName, formatVehicleTitle } from '@/lib/format';
 import { t } from '@/lib/i18n';
+import { vehicleCategoryIcon } from '@/lib/vehicles';
 import type { Vehicle } from '@/models/vehicle';
 
 interface VehicleCardProps {
@@ -13,15 +15,32 @@ interface VehicleCardProps {
 }
 
 export function VehicleCard({ vehicle, onPress }: VehicleCardProps) {
+  const theme = useTheme();
   const title = formatVehicleTitle(vehicle.brand, vehicle.model, vehicle.year);
+  const displayName = formatVehicleDisplayName(vehicle);
+  const hasNickname = !!vehicle.nickname?.trim();
+  const categoryIcon = vehicleCategoryIcon(
+    vehicle.category,
+  ) as keyof typeof MaterialCommunityIcons.glyphMap;
 
   return (
     <Card style={styles.card} onPress={onPress}>
       <Card.Content>
-        <Text variant="titleMedium">{vehicle.nickname}</Text>
-        <MutedText variant="bodyMedium" style={styles.subtitle}>
-          {title}
-        </MutedText>
+        <View style={styles.titleRow}>
+          <MaterialCommunityIcons
+            name={categoryIcon}
+            size={22}
+            color={theme.colors.primary}
+          />
+          <Text variant="titleMedium" style={styles.title}>
+            {displayName}
+          </Text>
+        </View>
+        {hasNickname ? (
+          <MutedText variant="bodyMedium" style={styles.subtitle}>
+            {title}
+          </MutedText>
+        ) : null}
         <View style={styles.metaRow}>
           <MutedText variant="bodySmall">
             {formatMileage(vehicle.currentMileage)} {t('mileageUnit')}
@@ -38,6 +57,14 @@ export function VehicleCard({ vehicle, onPress }: VehicleCardProps) {
 const styles = StyleSheet.create({
   card: {
     marginBottom: 12,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  title: {
+    marginLeft: 8,
+    flexShrink: 1,
   },
   subtitle: {
     marginTop: 4,

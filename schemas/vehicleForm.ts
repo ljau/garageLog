@@ -1,9 +1,12 @@
 import { z } from 'zod';
 
+import { VEHICLE_CATEGORIES } from '@/models/vehicle';
+
 const currentYear = new Date().getFullYear();
 
 export const vehicleFormSchema = z.object({
-  nickname: z.string().trim().min(1, 'Nickname is required'),
+  category: z.enum(VEHICLE_CATEGORIES),
+  nickname: z.string().trim().optional(),
   brand: z.string().trim().min(1, 'Brand is required'),
   model: z.string().trim().min(1, 'Model is required'),
   year: z

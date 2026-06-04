@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 
 import { DateTimePickerField } from '@/components/pickers/DateTimePickerField';
+import { VehicleCategoryPickerField } from '@/components/pickers/VehicleCategoryPickerField';
 import { t } from '@/lib/i18n';
 import {
   parseIntegerField,
@@ -19,15 +20,17 @@ interface VehicleFormProps {
 }
 
 export function vehicleToFormValues(vehicle: {
-  nickname: string;
+  nickname?: string;
   brand: string;
   model: string;
   year: number;
+  category: VehicleFormValues['category'];
   plateNumber?: string;
   currentMileage: number;
 }): VehicleFormValues {
   return {
-    nickname: vehicle.nickname,
+    category: vehicle.category,
+    nickname: vehicle.nickname ?? '',
     brand: vehicle.brand,
     model: vehicle.model,
     year: vehicle.year,
@@ -83,22 +86,16 @@ function VehicleFormFields({ control, errors }: VehicleFormFieldsProps) {
     <>
       <Controller
         control={control}
-        name="nickname"
+        name="category"
         render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            <TextInput
-              label={t('nickname')}
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              mode="outlined"
-              error={!!errors.nickname}
-              style={styles.input}
-            />
-            <HelperText type="error" visible={!!errors.nickname}>
-              {errors.nickname?.message}
-            </HelperText>
-          </>
+          <VehicleCategoryPickerField
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+            error={!!errors.category}
+            helperText={errors.category?.message}
+            style={styles.input}
+          />
         )}
       />
 
@@ -156,6 +153,21 @@ function VehicleFormFields({ control, errors }: VehicleFormFieldsProps) {
             onBlur={onBlur}
             error={!!errors.year}
             helperText={errors.year?.message}
+            style={styles.input}
+          />
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="nickname"
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            label={t('nicknameOptional')}
+            value={value ?? ''}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            mode="outlined"
             style={styles.input}
           />
         )}

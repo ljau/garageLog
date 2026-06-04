@@ -14,17 +14,19 @@ export async function insertVehicle(input: VehicleFormValues): Promise<Vehicle> 
   const db = await getDatabase();
   const id = Crypto.randomUUID();
   const createdAt = dayjs().toISOString();
+  const nickname = input.nickname?.trim() || '';
   const plateNumber = input.plateNumber?.trim() || null;
 
   await db.runAsync(
     `INSERT INTO vehicles (
-      id, nickname, brand, model, year, plate_number, current_mileage, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      id, nickname, brand, model, year, category, plate_number, current_mileage, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     id,
-    input.nickname.trim(),
+    nickname,
     input.brand.trim(),
     input.model.trim(),
     input.year,
+    input.category,
     plateNumber,
     input.currentMileage,
     createdAt,
@@ -32,10 +34,11 @@ export async function insertVehicle(input: VehicleFormValues): Promise<Vehicle> 
 
   return {
     id,
-    nickname: input.nickname.trim(),
+    nickname,
     brand: input.brand.trim(),
     model: input.model.trim(),
     year: input.year,
+    category: input.category,
     plateNumber: plateNumber ?? undefined,
     currentMileage: input.currentMileage,
     createdAt,
@@ -73,6 +76,7 @@ export async function updateVehicle(
   input: VehicleFormValues,
 ): Promise<Vehicle> {
   const db = await getDatabase();
+  const nickname = input.nickname?.trim() || '';
   const plateNumber = input.plateNumber?.trim() || null;
 
   const result = await db.runAsync(
@@ -81,13 +85,15 @@ export async function updateVehicle(
       brand = ?,
       model = ?,
       year = ?,
+      category = ?,
       plate_number = ?,
       current_mileage = ?
     WHERE id = ?`,
-    input.nickname.trim(),
+    nickname,
     input.brand.trim(),
     input.model.trim(),
     input.year,
+    input.category,
     plateNumber,
     input.currentMileage,
     id,

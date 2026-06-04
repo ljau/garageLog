@@ -9,9 +9,11 @@ import { screenContentContainerStyle } from '@/constants/screen';
 import { insertVehicle } from '@/database/vehicleRepository';
 import { t } from '@/lib/i18n';
 import { useDatabase } from '@/providers/DatabaseProvider';
+import { DEFAULT_VEHICLE_CATEGORY } from '@/models/vehicle';
 import type { VehicleFormValues } from '@/schemas/vehicleForm';
 
 const defaultValues: VehicleFormValues = {
+  category: DEFAULT_VEHICLE_CATEGORY,
   nickname: '',
   brand: '',
   model: '',
