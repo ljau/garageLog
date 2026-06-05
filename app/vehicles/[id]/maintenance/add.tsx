@@ -3,11 +3,17 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { Snackbar } from 'react-native-paper';
 
+import { ScreenBottomActions } from '@/components/ScreenBottomActions';
 import { ThemedScreen } from '@/components/ThemedScreen';
-import { screenContentContainerStyle } from '@/constants/screen';
+import { screenScrollContentStyle } from '@/constants/screen';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
-import { defaultMaintenanceFormValues, MaintenanceForm } from '@/components/MaintenanceForm';
+import {
+  defaultMaintenanceFormValues,
+  MaintenanceForm,
+  MaintenanceFormFields,
+  MaintenanceFormSubmit,
+} from '@/components/MaintenanceForm';
 import { insertMaintenanceRecord } from '@/database/maintenanceRepository';
 import { useVehicle } from '@/hooks/useVehicle';
 import { t } from '@/lib/i18n';
@@ -68,16 +74,23 @@ export default function AddMaintenanceScreen() {
         <KeyboardAvoidingView
           style={styles.flex}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <ScrollView
-            contentContainerStyle={screenContentContainerStyle}
-            keyboardShouldPersistTaps="handled">
           <MaintenanceForm
-            defaultValues={defaultMaintenanceFormValues(vehicle.currentMileage)}
-            submitLabel={t('saveMaintenance')}
-            onSubmit={onSubmit}
-            submitError={submitError}
-          />
-          </ScrollView>
+            defaultValues={defaultMaintenanceFormValues(vehicle.currentMileage)}>
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={screenScrollContentStyle}
+              keyboardShouldPersistTaps="handled">
+              <MaintenanceFormFields />
+            </ScrollView>
+
+            <ScreenBottomActions>
+              <MaintenanceFormSubmit
+                submitLabel={t('saveMaintenance')}
+                onSubmit={onSubmit}
+                submitError={submitError}
+              />
+            </ScreenBottomActions>
+          </MaintenanceForm>
 
           <Snackbar visible={snackbarVisible} onDismiss={() => setSnackbarVisible(false)}>
             {t('maintenanceSaved')}
@@ -90,6 +103,9 @@ export default function AddMaintenanceScreen() {
 
 const styles = StyleSheet.create({
   flex: {
+    flex: 1,
+  },
+  scroll: {
     flex: 1,
   },
 });

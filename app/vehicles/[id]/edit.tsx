@@ -3,11 +3,12 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { Snackbar } from 'react-native-paper';
 
+import { ScreenBottomActions } from '@/components/ScreenBottomActions';
 import { ThemedScreen } from '@/components/ThemedScreen';
 import { EmptyState } from '@/components/EmptyState';
-import { screenContentContainerStyle } from '@/constants/screen';
 import { LoadingState } from '@/components/LoadingState';
-import { VehicleForm, vehicleToFormValues } from '@/components/VehicleForm';
+import { VehicleForm, VehicleFormFields, VehicleFormSubmit, vehicleToFormValues } from '@/components/VehicleForm';
+import { screenScrollContentStyle } from '@/constants/screen';
 import { updateVehicle } from '@/database/vehicleRepository';
 import { useVehicle } from '@/hooks/useVehicle';
 import { t } from '@/lib/i18n';
@@ -68,17 +69,22 @@ export default function EditVehicleScreen() {
         <KeyboardAvoidingView
           style={styles.flex}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <ScrollView
-            contentContainerStyle={screenContentContainerStyle}
-            keyboardShouldPersistTaps="handled">
-          <VehicleForm
-            key={vehicle.id}
-            defaultValues={vehicleToFormValues(vehicle)}
-            submitLabel={t('updateVehicle')}
-            onSubmit={onSubmit}
-            submitError={submitError}
-          />
-          </ScrollView>
+          <VehicleForm key={vehicle.id} defaultValues={vehicleToFormValues(vehicle)}>
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={screenScrollContentStyle}
+              keyboardShouldPersistTaps="handled">
+              <VehicleFormFields />
+            </ScrollView>
+
+            <ScreenBottomActions>
+              <VehicleFormSubmit
+                submitLabel={t('updateVehicle')}
+                onSubmit={onSubmit}
+                submitError={submitError}
+              />
+            </ScreenBottomActions>
+          </VehicleForm>
 
           <Snackbar visible={snackbarVisible} onDismiss={() => setSnackbarVisible(false)}>
             {t('vehicleUpdated')}
@@ -91,6 +97,9 @@ export default function EditVehicleScreen() {
 
 const styles = StyleSheet.create({
   flex: {
+    flex: 1,
+  },
+  scroll: {
     flex: 1,
   },
 });

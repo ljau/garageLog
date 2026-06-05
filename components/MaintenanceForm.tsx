@@ -1,10 +1,19 @@
+import type { ReactNode } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from 'dayjs';
-import { Controller, useForm, type Control, type FieldErrors } from 'react-hook-form';
+import {
+  Controller,
+  FormProvider,
+  useForm,
+  useFormContext,
+  type Control,
+  type FieldErrors,
+} from 'react-hook-form';
 import { StyleSheet } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 
 import { DateTimePickerField } from '@/components/pickers/DateTimePickerField';
+import { MaintenanceTypePickerField } from '@/components/pickers/MaintenanceTypePickerField';
 import { t } from '@/lib/i18n';
 import {
   maintenanceFormSchema,
@@ -16,6 +25,10 @@ import type { MaintenanceRecord } from '@/models/maintenanceRecord';
 
 interface MaintenanceFormProps {
   defaultValues: MaintenanceFormValues;
+  children: ReactNode;
+}
+
+interface MaintenanceFormSubmitProps {
   submitLabel: string;
   onSubmit: (values: MaintenanceFormValues) => Promise<void>;
   submitError?: string | null;
@@ -47,25 +60,36 @@ export function defaultMaintenanceFormValues(
   };
 }
 
-export function MaintenanceForm({
-  defaultValues,
-  submitLabel,
-  onSubmit,
-  submitError,
-}: MaintenanceFormProps) {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<MaintenanceFormValues>({
+export function MaintenanceForm({ defaultValues, children }: MaintenanceFormProps) {
+  const methods = useForm<MaintenanceFormValues>({
     resolver: zodResolver(maintenanceFormSchema),
     defaultValues,
   });
 
+  return <FormProvider {...methods}>{children}</FormProvider>;
+}
+
+export function MaintenanceFormFields() {
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<MaintenanceFormValues>();
+
+  return <MaintenanceFormFieldsInner control={control} errors={errors} />;
+}
+
+export function MaintenanceFormSubmit({
+  submitLabel,
+  onSubmit,
+  submitError,
+}: MaintenanceFormSubmitProps) {
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useFormContext<MaintenanceFormValues>();
+
   return (
     <>
-      <MaintenanceFormFields control={control} errors={errors} />
-
       {submitError ? (
         <HelperText type="error" visible>
           {submitError}
@@ -76,8 +100,7 @@ export function MaintenanceForm({
         mode="contained"
         onPress={handleSubmit(onSubmit)}
         loading={isSubmitting}
-        disabled={isSubmitting}
-        style={styles.submit}>
+        disabled={isSubmitting}>
         {submitLabel}
       </Button>
     </>
@@ -89,27 +112,21 @@ interface MaintenanceFormFieldsProps {
   errors: FieldErrors<MaintenanceFormValues>;
 }
 
-function MaintenanceFormFields({ control, errors }: MaintenanceFormFieldsProps) {
+function MaintenanceFormFieldsInner({ control, errors }: MaintenanceFormFieldsProps) {
   return (
     <>
       <Controller
         control={control}
         name="type"
         render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            <TextInput
-              label={t('maintenanceType')}
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              mode="outlined"
-              error={!!errors.type}
-              style={styles.input}
-            />
-            <HelperText type="error" visible={!!errors.type}>
-              {errors.type?.message}
-            </HelperText>
-          </>
+          <MaintenanceTypePickerField
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+            error={!!errors.type}
+            helperText={errors.type?.message}
+            style={styles.input}
+          />
         )}
       />
 
@@ -218,8 +235,5 @@ function MaintenanceFormFields({ control, errors }: MaintenanceFormFieldsProps) 
 const styles = StyleSheet.create({
   input: {
     marginBottom: 4,
-  },
-  submit: {
-    marginTop: 16,
   },
 });

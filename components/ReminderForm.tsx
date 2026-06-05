@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
+import { createContext, useContext, type ReactNode } from 'react';
+import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
 import { Button, HelperText, SegmentedButtons, Text, TextInput } from 'react-native-paper';
 
@@ -16,11 +17,17 @@ import {
 
 interface ReminderFormProps {
   defaultValues: ReminderFormValues;
+  children: ReactNode;
+  webNotice?: string | null;
+}
+
+interface ReminderFormSubmitProps {
   submitLabel: string;
   onSubmit: (values: ReminderFormValues) => Promise<void>;
   submitError?: string | null;
-  webNotice?: string | null;
 }
+
+const ReminderFormOptionsContext = createContext<{ webNotice?: string | null }>({});
 
 export function reminderToFormValues(reminder: Reminder): ReminderFormValues {
   return scheduledAtToReminderForm(
@@ -37,21 +44,27 @@ const typeOptions = REMINDER_TYPES.map((type) => ({
   label: reminderTypeLabel(type),
 }));
 
-export function ReminderForm({
-  defaultValues,
-  submitLabel,
-  onSubmit,
-  submitError,
-  webNotice,
-}: ReminderFormProps) {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<ReminderFormValues>({
+export function ReminderForm({ defaultValues, children, webNotice }: ReminderFormProps) {
+  const methods = useForm<ReminderFormValues>({
     resolver: zodResolver(reminderFormSchema),
     defaultValues,
   });
+
+  return (
+    <FormProvider {...methods}>
+      <ReminderFormOptionsContext.Provider value={{ webNotice }}>
+        {children}
+      </ReminderFormOptionsContext.Provider>
+    </FormProvider>
+  );
+}
+
+export function ReminderFormFields() {
+  const { webNotice } = useContext(ReminderFormOptionsContext);
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<ReminderFormValues>();
 
   return (
     <>
@@ -136,7 +149,22 @@ export function ReminderForm({
           {webNotice}
         </HelperText>
       ) : null}
+    </>
+  );
+}
 
+export function ReminderFormSubmit({
+  submitLabel,
+  onSubmit,
+  submitError,
+}: ReminderFormSubmitProps) {
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useFormContext<ReminderFormValues>();
+
+  return (
+    <>
       {submitError ? (
         <HelperText type="error" visible>
           {submitError}
@@ -147,8 +175,7 @@ export function ReminderForm({
         mode="contained"
         onPress={handleSubmit(onSubmit)}
         loading={isSubmitting}
-        disabled={isSubmitting}
-        style={styles.submit}>
+        disabled={isSubmitting}>
         {submitLabel}
       </Button>
     </>
@@ -167,8 +194,5 @@ const styles = StyleSheet.create({
   },
   webNotice: {
     marginTop: 8,
-  },
-  submit: {
-    marginTop: 24,
   },
 });

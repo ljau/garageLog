@@ -3,9 +3,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 
-import { screenContentContainerStyle } from '@/constants/screen';
+import { screenScrollContentStyle } from '@/constants/screen';
 import { EmptyState } from '@/components/EmptyState';
 import { NextUpSection } from '@/components/NextUpSection';
+import { ScreenBottomActions } from '@/components/ScreenBottomActions';
 import { ThemedScreen } from '@/components/ThemedScreen';
 import { LoadingState } from '@/components/LoadingState';
 import { StatCard } from '@/components/StatCard';
@@ -80,7 +81,7 @@ export default function DashboardScreen() {
     <ThemedScreen>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={screenContentContainerStyle}>
+        contentContainerStyle={screenScrollContentStyle}>
       <Text variant="headlineSmall" style={styles.heading}>
         {t('appName')}
       </Text>
@@ -130,15 +131,13 @@ export default function DashboardScreen() {
           />
         ))
       )}
-
-      <Button
-        mode="contained"
-        icon="plus"
-        onPress={goToAddVehicle}
-        style={styles.addButton}>
-        {t('addVehicle')}
-      </Button>
       </ScrollView>
+
+      <ScreenBottomActions>
+        <Button mode="contained" icon="plus" onPress={goToAddVehicle}>
+          {t('addVehicle')}
+        </Button>
+      </ScreenBottomActions>
     </ThemedScreen>
   );
 }
@@ -160,8 +159,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 12,
-  },
-  addButton: {
-    marginTop: 24,
   },
 });

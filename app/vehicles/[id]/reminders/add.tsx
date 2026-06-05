@@ -4,11 +4,17 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-na
 import { getNotificationUnavailableNotice } from '@/lib/notificationNotice';
 import { Snackbar } from 'react-native-paper';
 
+import { ScreenBottomActions } from '@/components/ScreenBottomActions';
 import { ThemedScreen } from '@/components/ThemedScreen';
-import { screenContentContainerStyle } from '@/constants/screen';
+import { screenScrollContentStyle } from '@/constants/screen';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
-import { defaultReminderFormValues, ReminderForm } from '@/components/ReminderForm';
+import {
+  defaultReminderFormValues,
+  ReminderForm,
+  ReminderFormFields,
+  ReminderFormSubmit,
+} from '@/components/ReminderForm';
 import { insertReminder } from '@/database/reminderRepository';
 import { useVehicle } from '@/hooks/useVehicle';
 import { t } from '@/lib/i18n';
@@ -71,17 +77,24 @@ export default function AddReminderScreen() {
         <KeyboardAvoidingView
           style={styles.flex}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <ScrollView
-            contentContainerStyle={screenContentContainerStyle}
-            keyboardShouldPersistTaps="handled">
-            <ReminderForm
-              defaultValues={defaultReminderFormValues()}
-              submitLabel={t('saveReminder')}
-              onSubmit={onSubmit}
-              submitError={submitError}
-              webNotice={notificationNotice}
-            />
-          </ScrollView>
+          <ReminderForm
+            defaultValues={defaultReminderFormValues()}
+            webNotice={notificationNotice}>
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={screenScrollContentStyle}
+              keyboardShouldPersistTaps="handled">
+              <ReminderFormFields />
+            </ScrollView>
+
+            <ScreenBottomActions>
+              <ReminderFormSubmit
+                submitLabel={t('saveReminder')}
+                onSubmit={onSubmit}
+                submitError={submitError}
+              />
+            </ScreenBottomActions>
+          </ReminderForm>
 
           <Snackbar visible={snackbarVisible} onDismiss={() => setSnackbarVisible(false)}>
             {t('reminderSaved')}
@@ -94,6 +107,9 @@ export default function AddReminderScreen() {
 
 const styles = StyleSheet.create({
   flex: {
+    flex: 1,
+  },
+  scroll: {
     flex: 1,
   },
 });

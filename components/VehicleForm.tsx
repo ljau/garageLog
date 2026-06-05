@@ -1,6 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm, useWatch, type Control, type FieldErrors } from 'react-hook-form';
+import {
+  Controller,
+  FormProvider,
+  useForm,
+  useFormContext,
+  useWatch,
+  type Control,
+  type FieldErrors,
+} from 'react-hook-form';
 import { StyleSheet } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 
@@ -19,6 +27,10 @@ import {
 
 interface VehicleFormProps {
   defaultValues: VehicleFormValues;
+  children: ReactNode;
+}
+
+interface VehicleFormSubmitProps {
   submitLabel: string;
   onSubmit: (values: VehicleFormValues) => Promise<void>;
   submitError?: string | null;
@@ -44,25 +56,36 @@ export function vehicleToFormValues(vehicle: {
   };
 }
 
-export function VehicleForm({
-  defaultValues,
-  submitLabel,
-  onSubmit,
-  submitError,
-}: VehicleFormProps) {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<VehicleFormValues>({
+export function VehicleForm({ defaultValues, children }: VehicleFormProps) {
+  const methods = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleFormSchema),
     defaultValues,
   });
 
+  return <FormProvider {...methods}>{children}</FormProvider>;
+}
+
+export function VehicleFormFields() {
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<VehicleFormValues>();
+
+  return <VehicleFormFieldsInner control={control} errors={errors} />;
+}
+
+export function VehicleFormSubmit({
+  submitLabel,
+  onSubmit,
+  submitError,
+}: VehicleFormSubmitProps) {
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useFormContext<VehicleFormValues>();
+
   return (
     <>
-      <VehicleFormFields control={control} errors={errors} />
-
       {submitError ? (
         <HelperText type="error" visible>
           {submitError}
@@ -73,8 +96,7 @@ export function VehicleForm({
         mode="contained"
         onPress={handleSubmit(onSubmit)}
         loading={isSubmitting}
-        disabled={isSubmitting}
-        style={styles.submit}>
+        disabled={isSubmitting}>
         {submitLabel}
       </Button>
     </>
@@ -86,7 +108,7 @@ interface VehicleFormFieldsProps {
   errors: FieldErrors<VehicleFormValues>;
 }
 
-function VehicleFormFields({ control, errors }: VehicleFormFieldsProps) {
+function VehicleFormFieldsInner({ control, errors }: VehicleFormFieldsProps) {
   const category = useWatch({ control, name: 'category' });
   const brand = useWatch({ control, name: 'brand' });
   const model = useWatch({ control, name: 'model' });
@@ -310,8 +332,5 @@ function ModelField({
 const styles = StyleSheet.create({
   input: {
     marginBottom: 4,
-  },
-  submit: {
-    marginTop: 16,
   },
 });

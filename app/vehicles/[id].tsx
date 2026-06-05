@@ -4,10 +4,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Divider, Snackbar, Text, useTheme } from 'react-native-paper';
 
-import { screenContentContainerStyle } from '@/constants/screen';
 import { ThemedScreen } from '@/components/ThemedScreen';
 import { DeleteVehicleDialog } from '@/components/DeleteVehicleDialog';
 import { MutedText } from '@/components/MutedText';
+import { ScreenBottomActions } from '@/components/ScreenBottomActions';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
 import { deleteVehicle } from '@/database/vehicleRepository';
@@ -16,6 +16,7 @@ import { formatDate, formatMileage, formatVehicleDisplayName, formatVehicleTitle
 import { t } from '@/lib/i18n';
 import { vehicleCategoryIcon, vehicleCategoryLabel } from '@/lib/vehicles';
 import { useDatabase } from '@/providers/DatabaseProvider';
+import { screenScrollContentStyle } from '@/constants/screen';
 
 export default function VehicleDetailScreen() {
   const theme = useTheme();
@@ -81,9 +82,7 @@ export default function VehicleDetailScreen() {
     <>
       <Stack.Screen options={{ title: displayName }} />
       <ThemedScreen>
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={screenContentContainerStyle}>
+        <ScrollView style={styles.scroll} contentContainerStyle={screenScrollContentStyle}>
         <Text variant="headlineSmall">{displayName}</Text>
         {hasNickname ? (
           <MutedText variant="titleMedium" style={styles.subtitle}>
@@ -134,43 +133,41 @@ export default function VehicleDetailScreen() {
           <MutedText variant="labelLarge">{t('addedOn')}</MutedText>
           <Text variant="bodyLarge">{formatDate(vehicle.createdAt)}</Text>
         </View>
-
-        <Button
-          mode="contained"
-          icon="wrench"
-          onPress={() => router.push(`/vehicles/${vehicle.id}/maintenance`)}
-          style={styles.action}>
-          {t('viewMaintenanceHistory')}
-        </Button>
-        <Button
-          mode="contained"
-          icon="bell"
-          onPress={() => router.push(`/vehicles/${vehicle.id}/reminders`)}
-          style={styles.action}>
-          {t('viewReminders')}
-        </Button>
-        <Button
-          mode="contained"
-          icon="pencil"
-          onPress={() => router.push(`/vehicles/${vehicle.id}/edit`)}
-          style={styles.action}>
-          {t('edit')}
-        </Button>
-        <Button
-          mode="outlined"
-          icon="delete"
-          textColor="#B00020"
-          onPress={() => setDeleteDialogVisible(true)}
-          style={styles.action}>
-          {t('deleteVehicle')}
-        </Button>
-
-        {deleteError ? (
-          <Text variant="bodySmall" style={styles.error}>
-            {deleteError}
-          </Text>
-        ) : null}
         </ScrollView>
+
+        <ScreenBottomActions>
+          <Button
+            mode="contained-tonal"
+            icon="wrench"
+            onPress={() => router.push(`/vehicles/${vehicle.id}/maintenance`)}>
+            {t('viewMaintenanceHistory')}
+          </Button>
+          <Button
+            mode="contained-tonal"
+            icon="bell"
+            onPress={() => router.push(`/vehicles/${vehicle.id}/reminders`)}>
+            {t('viewReminders')}
+          </Button>
+          <Button
+            mode="contained"
+            icon="pencil"
+            onPress={() => router.push(`/vehicles/${vehicle.id}/edit`)}>
+            {t('edit')}
+          </Button>
+          <Button
+            mode="outlined"
+            icon="delete"
+            textColor="#B00020"
+            onPress={() => setDeleteDialogVisible(true)}>
+            {t('deleteVehicle')}
+          </Button>
+
+          {deleteError ? (
+            <Text variant="bodySmall" style={styles.error}>
+              {deleteError}
+            </Text>
+          ) : null}
+        </ScreenBottomActions>
       </ThemedScreen>
 
       <DeleteVehicleDialog
@@ -215,11 +212,7 @@ const styles = StyleSheet.create({
   categoryLabel: {
     marginLeft: 6,
   },
-  action: {
-    marginTop: 12,
-  },
   error: {
-    marginTop: 12,
     color: '#B00020',
   },
 });

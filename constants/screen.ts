@@ -10,6 +10,10 @@ export const screenContentContainerStyle: ViewStyle = {
   paddingBottom: 32,
 };
 
+export const screenScrollContentStyle: ViewStyle = {
+  padding: 16,
+};
+
 export function getHeaderScreenOptions(theme: MD3Theme) {
   return {
     headerStyle: { backgroundColor: theme.colors.elevation.level2 },

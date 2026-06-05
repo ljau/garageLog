@@ -36,7 +36,7 @@ export default function TabLayout() {
         options={{
           title: t('expenseSummary'),
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="chart-pie" color={color} size={size} />
+            <MaterialCommunityIcons name="currency-usd" color={color} size={size} />
           ),
         }}
       />

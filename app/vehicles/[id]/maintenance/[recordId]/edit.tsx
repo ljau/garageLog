@@ -3,14 +3,17 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { Button, Snackbar, Text } from 'react-native-paper';
 
+import { ScreenBottomActions } from '@/components/ScreenBottomActions';
 import { ThemedScreen } from '@/components/ThemedScreen';
-import { screenContentContainerStyle } from '@/constants/screen';
+import { screenScrollContentStyle } from '@/constants/screen';
 import { DeleteMaintenanceDialog } from '@/components/DeleteMaintenanceDialog';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
 import {
   maintenanceRecordToFormValues,
   MaintenanceForm,
+  MaintenanceFormFields,
+  MaintenanceFormSubmit,
 } from '@/components/MaintenanceForm';
 import {
   deleteMaintenanceRecord,
@@ -102,31 +105,35 @@ export default function EditMaintenanceScreen() {
         <KeyboardAvoidingView
           style={styles.flex}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <ScrollView
-            contentContainerStyle={screenContentContainerStyle}
-            keyboardShouldPersistTaps="handled">
-          <MaintenanceForm
-            defaultValues={maintenanceRecordToFormValues(record)}
-            submitLabel={t('updateMaintenance')}
-            onSubmit={onSubmit}
-            submitError={submitError}
-          />
+          <MaintenanceForm defaultValues={maintenanceRecordToFormValues(record)}>
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={screenScrollContentStyle}
+              keyboardShouldPersistTaps="handled">
+              <MaintenanceFormFields />
+            </ScrollView>
 
-          <Button
-            mode="outlined"
-            icon="delete"
-            textColor="#B00020"
-            onPress={() => setDeleteDialogVisible(true)}
-            style={styles.deleteButton}>
-            {t('deleteMaintenance')}
-          </Button>
+            <ScreenBottomActions>
+              <MaintenanceFormSubmit
+                submitLabel={t('updateMaintenance')}
+                onSubmit={onSubmit}
+                submitError={submitError}
+              />
+              <Button
+                mode="outlined"
+                icon="delete"
+                textColor="#B00020"
+                onPress={() => setDeleteDialogVisible(true)}>
+                {t('deleteMaintenance')}
+              </Button>
 
-          {deleteError ? (
-            <Text variant="bodySmall" style={styles.error}>
-              {deleteError}
-            </Text>
-          ) : null}
-          </ScrollView>
+              {deleteError ? (
+                <Text variant="bodySmall" style={styles.error}>
+                  {deleteError}
+                </Text>
+              ) : null}
+            </ScreenBottomActions>
+          </MaintenanceForm>
 
           <DeleteMaintenanceDialog
             visible={deleteDialogVisible}
@@ -153,11 +160,10 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
-  deleteButton: {
-    marginTop: 12,
+  scroll: {
+    flex: 1,
   },
   error: {
-    marginTop: 12,
     color: '#B00020',
   },
 });

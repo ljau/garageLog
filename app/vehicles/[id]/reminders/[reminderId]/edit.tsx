@@ -4,12 +4,18 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-na
 import { getNotificationUnavailableNotice } from '@/lib/notificationNotice';
 import { Button, Snackbar, Text } from 'react-native-paper';
 
+import { ScreenBottomActions } from '@/components/ScreenBottomActions';
 import { ThemedScreen } from '@/components/ThemedScreen';
-import { screenContentContainerStyle } from '@/constants/screen';
+import { screenScrollContentStyle } from '@/constants/screen';
 import { DeleteReminderDialog } from '@/components/DeleteReminderDialog';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
-import { reminderToFormValues, ReminderForm } from '@/components/ReminderForm';
+import {
+  reminderToFormValues,
+  ReminderForm,
+  ReminderFormFields,
+  ReminderFormSubmit,
+} from '@/components/ReminderForm';
 import { deleteReminder, updateReminder } from '@/database/reminderRepository';
 import { useReminder } from '@/hooks/useReminder';
 import { reminderTypeLabel } from '@/lib/reminders';
@@ -100,32 +106,37 @@ export default function EditReminderScreen() {
         <KeyboardAvoidingView
           style={styles.flex}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <ScrollView
-            contentContainerStyle={screenContentContainerStyle}
-            keyboardShouldPersistTaps="handled">
-            <ReminderForm
-              defaultValues={reminderToFormValues(reminder)}
-              submitLabel={t('updateReminder')}
-              onSubmit={onSubmit}
-              submitError={submitError}
-              webNotice={notificationNotice}
-            />
+          <ReminderForm
+            defaultValues={reminderToFormValues(reminder)}
+            webNotice={notificationNotice}>
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={screenScrollContentStyle}
+              keyboardShouldPersistTaps="handled">
+              <ReminderFormFields />
+            </ScrollView>
 
-            <Button
-              mode="outlined"
-              icon="delete"
-              textColor="#B00020"
-              onPress={() => setDeleteDialogVisible(true)}
-              style={styles.deleteButton}>
-              {t('deleteReminder')}
-            </Button>
+            <ScreenBottomActions>
+              <ReminderFormSubmit
+                submitLabel={t('updateReminder')}
+                onSubmit={onSubmit}
+                submitError={submitError}
+              />
+              <Button
+                mode="outlined"
+                icon="delete"
+                textColor="#B00020"
+                onPress={() => setDeleteDialogVisible(true)}>
+                {t('deleteReminder')}
+              </Button>
 
-            {deleteError ? (
-              <Text variant="bodySmall" style={styles.error}>
-                {deleteError}
-              </Text>
-            ) : null}
-          </ScrollView>
+              {deleteError ? (
+                <Text variant="bodySmall" style={styles.error}>
+                  {deleteError}
+                </Text>
+              ) : null}
+            </ScreenBottomActions>
+          </ReminderForm>
 
           <DeleteReminderDialog
             visible={deleteDialogVisible}
@@ -152,11 +163,10 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
-  deleteButton: {
-    marginTop: 12,
+  scroll: {
+    flex: 1,
   },
   error: {
-    marginTop: 12,
     color: '#B00020',
   },
 });
