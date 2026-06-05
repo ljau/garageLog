@@ -166,6 +166,14 @@ export async function getReminderById(id: string): Promise<Reminder | null> {
   return row ? rowToReminder(row) : null;
 }
 
+export async function getAllReminders(): Promise<Reminder[]> {
+  const db = await getDatabase();
+  const rows = await db.getAllAsync<ReminderRow>(
+    `SELECT * FROM reminders ORDER BY scheduled_at ASC`,
+  );
+  return rows.map(rowToReminder);
+}
+
 export async function getRemindersByVehicleId(vehicleId: string): Promise<Reminder[]> {
   const db = await getDatabase();
   const rows = await db.getAllAsync<ReminderRow>(

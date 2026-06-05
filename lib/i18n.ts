@@ -128,6 +128,33 @@ const en = {
     'Add maintenance records with a cost to see your expense summary here.',
   noVehicleExpenses: 'No vehicle has logged costs yet.',
   expenseRecordCount: '{count} records',
+  dataAndBackup: 'Data & backup',
+  dataAndBackupDescription:
+    'Export your vehicles, maintenance history, and reminders as a JSON file. You can save it anywhere and import it later on this or another device.',
+  backupContents: 'Included in backup',
+  backupVehicleCount: '{count} vehicles',
+  backupMaintenanceCount: '{count} maintenance records',
+  backupReminderCount: '{count} reminders',
+  exportBackup: 'Export backup',
+  exportBackupHint:
+    'Creates a backup file, then opens the system share sheet so you can pick Files, Drive, or another app.',
+  exportBackupShareTitle: 'Save backup',
+  exportBackupSuccess: 'Backup file created',
+  exportBackupFailed: 'Could not export backup. Please try again.',
+  exportBackupShareUnavailable: 'Sharing is not available on this device.',
+  importBackup: 'Import backup',
+  importBackupHint:
+    'Replaces all current data with the contents of a GarageLog backup file. This cannot be undone.',
+  importBackupTitle: 'Import backup?',
+  importBackupMessage:
+    'Importing "{fileName}" will replace all vehicles, maintenance records, and reminders currently on this device.',
+  importBackupUnknownFile: 'the selected file',
+  importBackupConfirm: 'Import',
+  importBackupSuccess: 'Backup imported',
+  importBackupFailed: 'Could not import backup. Please try again.',
+  importBackupInvalid: 'That file is not a valid GarageLog backup.',
+  importBackupNotJson: 'The selected file is not valid JSON.',
+  importBackupUnreadable: 'Could not read the selected file.',
 } as const;
 
 type TranslationKey = keyof typeof en;

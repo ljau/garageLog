@@ -58,6 +58,14 @@ export async function getMaintenanceRecordById(
   return row ? rowToMaintenanceRecord(row) : null;
 }
 
+export async function getAllMaintenanceRecords(): Promise<MaintenanceRecord[]> {
+  const db = await getDatabase();
+  const rows = await db.getAllAsync<MaintenanceRecordRow>(
+    `SELECT * FROM maintenance_records ORDER BY service_date DESC, created_at DESC`,
+  );
+  return rows.map(rowToMaintenanceRecord);
+}
+
 export async function getMaintenanceRecordsByVehicleId(
   vehicleId: string,
 ): Promise<MaintenanceRecord[]> {

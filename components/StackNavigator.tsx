@@ -48,6 +48,7 @@ export function StackNavigator() {
           presentation: 'modal',
         }}
       />
+      <Stack.Screen name="data" />
     </Stack>
   );
 }
