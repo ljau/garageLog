@@ -185,6 +185,39 @@ export async function getUpcomingReminders(): Promise<Reminder[]> {
   return rows.map(rowToReminder);
 }
 
+interface DashboardReminderRow extends ReminderRow {
+  nickname: string;
+  brand: string;
+  model: string;
+  year: number;
+}
+
+export interface DashboardReminder extends Reminder {
+  vehicleName: string;
+}
+
+export async function getDashboardReminders(limit = 5): Promise<DashboardReminder[]> {
+  const db = await getDatabase();
+  const rows = await db.getAllAsync<DashboardReminderRow>(
+    `SELECT r.*, v.nickname, v.brand, v.model, v.year
+     FROM reminders r
+     INNER JOIN vehicles v ON v.id = r.vehicle_id
+     ORDER BY r.scheduled_at ASC
+     LIMIT ?`,
+    limit,
+  );
+
+  return rows.map((row) => ({
+    ...rowToReminder(row),
+    vehicleName: formatVehicleDisplayName({
+      nickname: row.nickname,
+      brand: row.brand,
+      model: row.model,
+      year: row.year,
+    }),
+  }));
+}
+
 export async function syncScheduledReminderNotifications(): Promise<void> {
   const reminders = await getUpcomingReminders();
 

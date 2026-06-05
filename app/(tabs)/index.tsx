@@ -1,15 +1,18 @@
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 
 import { screenContentContainerStyle } from '@/constants/screen';
 import { EmptyState } from '@/components/EmptyState';
+import { NextUpSection } from '@/components/NextUpSection';
 import { ThemedScreen } from '@/components/ThemedScreen';
 import { LoadingState } from '@/components/LoadingState';
 import { StatCard } from '@/components/StatCard';
 import { VehicleCard } from '@/components/VehicleCard';
+import type { DashboardReminder } from '@/database/reminderRepository';
 import { getVehicleStats } from '@/database/vehicleRepository';
+import { useDashboardReminders } from '@/hooks/useDashboardReminders';
 import { useRecentVehicles } from '@/hooks/useVehicles';
 import { formatMileage } from '@/lib/format';
 import { t } from '@/lib/i18n';
@@ -19,6 +22,11 @@ export default function DashboardScreen() {
   const router = useRouter();
   const { isReady, status, error: dbError } = useDatabase();
   const { vehicles, isLoading, error, reload } = useRecentVehicles(3);
+  const {
+    reminders: dashboardReminders,
+    isLoading: remindersLoading,
+    reload: reloadReminders,
+  } = useDashboardReminders(5);
   const [stats, setStats] = useState({ total: 0, averageMileage: 0 });
 
   const loadStats = useCallback(async () => {
@@ -31,16 +39,27 @@ export default function DashboardScreen() {
     void loadStats();
   }, [loadStats, vehicles.length]);
 
-  useEffect(() => {
-    if (isReady) {
+  useFocusEffect(
+    useCallback(() => {
+      if (!isReady) {
+        return;
+      }
+
       void reload();
-    }
-  }, [isReady, reload]);
+      void loadStats();
+      void reloadReminders();
+    }, [isReady, reload, loadStats, reloadReminders]),
+  );
 
   const goToAddVehicle = () => router.push('/vehicles/add');
   const goToVehicles = () => router.push('/(tabs)/vehicles');
+  const goToReminder = (reminder: DashboardReminder) =>
+    router.push(`/vehicles/${reminder.vehicleId}/reminders/${reminder.id}/edit`);
 
-  if (status === 'loading' || (isReady && isLoading && vehicles.length === 0 && stats.total === 0)) {
+  if (
+    status === 'loading' ||
+    (isReady && isLoading && remindersLoading && vehicles.length === 0 && stats.total === 0)
+  ) {
     return <LoadingState />;
   }
 
@@ -77,6 +96,13 @@ export default function DashboardScreen() {
           }
         />
       </View>
+
+      {stats.total > 0 ? (
+        <NextUpSection
+          reminders={dashboardReminders}
+          onReminderPress={goToReminder}
+        />
+      ) : null}
 
       <View style={styles.sectionHeader}>
         <Text variant="titleMedium">{t('recentVehicles')}</Text>
