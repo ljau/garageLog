@@ -1,10 +1,15 @@
+import { useEffect, useRef } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm, type Control, type FieldErrors } from 'react-hook-form';
+import { Controller, useForm, useWatch, type Control, type FieldErrors } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 
 import { DateTimePickerField } from '@/components/pickers/DateTimePickerField';
+import { VehicleBrandPickerField } from '@/components/pickers/VehicleBrandPickerField';
 import { VehicleCategoryPickerField } from '@/components/pickers/VehicleCategoryPickerField';
+import { VehicleModelPickerField } from '@/components/pickers/VehicleModelPickerField';
+import { isKnownBrand } from '@/data/vehicleBrands';
+import { isKnownModel } from '@/data/vehicleModels';
 import { t } from '@/lib/i18n';
 import {
   parseIntegerField,
@@ -82,6 +87,10 @@ interface VehicleFormFieldsProps {
 }
 
 function VehicleFormFields({ control, errors }: VehicleFormFieldsProps) {
+  const category = useWatch({ control, name: 'category' });
+  const brand = useWatch({ control, name: 'brand' });
+  const model = useWatch({ control, name: 'model' });
+
   return (
     <>
       <Controller
@@ -103,20 +112,14 @@ function VehicleFormFields({ control, errors }: VehicleFormFieldsProps) {
         control={control}
         name="brand"
         render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            <TextInput
-              label={t('brand')}
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              mode="outlined"
-              error={!!errors.brand}
-              style={styles.input}
-            />
-            <HelperText type="error" visible={!!errors.brand}>
-              {errors.brand?.message}
-            </HelperText>
-          </>
+          <BrandField
+            category={category}
+            brand={brand}
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+            error={errors.brand?.message}
+          />
         )}
       />
 
@@ -124,20 +127,15 @@ function VehicleFormFields({ control, errors }: VehicleFormFieldsProps) {
         control={control}
         name="model"
         render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            <TextInput
-              label={t('model')}
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              mode="outlined"
-              error={!!errors.model}
-              style={styles.input}
-            />
-            <HelperText type="error" visible={!!errors.model}>
-              {errors.model?.message}
-            </HelperText>
-          </>
+          <ModelField
+            category={category}
+            brand={brand}
+            model={model}
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+            error={errors.model?.message}
+          />
         )}
       />
 
@@ -211,6 +209,101 @@ function VehicleFormFields({ control, errors }: VehicleFormFieldsProps) {
         )}
       />
     </>
+  );
+}
+
+interface BrandFieldProps {
+  category: VehicleFormValues['category'];
+  brand: string;
+  value: string;
+  onChange: (brand: string) => void;
+  onBlur: () => void;
+  error?: string;
+}
+
+function BrandField({ category, brand, value, onChange, onBlur, error }: BrandFieldProps) {
+  const previousCategory = useRef(category);
+
+  useEffect(() => {
+    if (previousCategory.current === category) {
+      return;
+    }
+    previousCategory.current = category;
+
+    if (!brand) {
+      return;
+    }
+    if (category === 'other') {
+      return;
+    }
+    if (isKnownBrand(category, brand)) {
+      return;
+    }
+    onChange('');
+  }, [category, brand, onChange]);
+
+  return (
+    <VehicleBrandPickerField
+      category={category}
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+      error={!!error}
+      helperText={error}
+      style={styles.input}
+    />
+  );
+}
+
+function ModelField({
+  category,
+  brand,
+  model,
+  value,
+  onChange,
+  onBlur,
+  error,
+}: {
+  category: VehicleFormValues['category'];
+  brand: string;
+  model: string;
+  value: string;
+  onChange: (model: string) => void;
+  onBlur: () => void;
+  error?: string;
+}) {
+  const previousCategory = useRef(category);
+  const previousBrand = useRef(brand);
+
+  useEffect(() => {
+    const categoryChanged = previousCategory.current !== category;
+    const brandChanged = previousBrand.current !== brand;
+    previousCategory.current = category;
+    previousBrand.current = brand;
+
+    if (!categoryChanged && !brandChanged) {
+      return;
+    }
+    if (!model) {
+      return;
+    }
+    if (isKnownModel(category, brand, model)) {
+      return;
+    }
+    onChange('');
+  }, [category, brand, model, onChange]);
+
+  return (
+    <VehicleModelPickerField
+      category={category}
+      brand={brand}
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+      error={!!error}
+      helperText={error}
+      style={styles.input}
+    />
   );
 }
 

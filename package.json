@@ -5,7 +5,9 @@
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
     "@hookform/resolvers": "^5.4.0",
+    "@meterapp/vehicle-db": "^2.3.0",
     "@react-native-community/datetimepicker": "9.1.0",
+    "auto-parts-db": "^2.0.0",
     "dayjs": "^1.11.21",
     "expo": "~56.0.8",
     "expo-constants": "~56.0.16",

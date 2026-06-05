@@ -136,14 +136,14 @@ export default function VehicleDetailScreen() {
         </View>
 
         <Button
-          mode="contained-tonal"
+          mode="contained"
           icon="wrench"
           onPress={() => router.push(`/vehicles/${vehicle.id}/maintenance`)}
           style={styles.action}>
           {t('viewMaintenanceHistory')}
         </Button>
         <Button
-          mode="contained-tonal"
+          mode="contained"
           icon="bell"
           onPress={() => router.push(`/vehicles/${vehicle.id}/reminders`)}
           style={styles.action}>

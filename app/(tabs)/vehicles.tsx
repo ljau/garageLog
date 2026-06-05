@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { FlatList, StyleSheet } from 'react-native';
-import { FAB } from 'react-native-paper';
-
+import { PrimaryFab } from '@/components/PrimaryFab';
 import { ThemedScreen } from '@/components/ThemedScreen';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
@@ -51,7 +50,7 @@ export default function VehiclesScreen() {
           />
         }
       />
-      <FAB
+      <PrimaryFab
         icon="plus"
         style={fabStyle}
         onPress={() => router.push('/vehicles/add')}
