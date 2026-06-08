@@ -1,7 +1,14 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
-import { HelperText, Menu, TextInput, useTheme } from 'react-native-paper';
+import {
+  Modal,
+  Pressable,
+  StyleSheet,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
+import { Button, HelperText, Text, TextInput, useTheme } from 'react-native-paper';
 
 import { t } from '@/lib/i18n';
 import { vehicleCategoryIcon, vehicleCategoryLabel } from '@/lib/vehicles';
@@ -25,65 +32,121 @@ export function VehicleCategoryPickerField({
   style,
 }: VehicleCategoryPickerFieldProps) {
   const theme = useTheme();
-  const [menuVisible, setMenuVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const openMenu = () => setMenuVisible(true);
-  const closeMenu = () => {
-    setMenuVisible(false);
+  const closeModal = () => {
+    setModalVisible(false);
     onBlur?.();
   };
 
   const selectCategory = (category: VehicleCategory) => {
     onChange(category);
-    closeMenu();
+    closeModal();
   };
 
   const iconName = vehicleCategoryIcon(value) as keyof typeof MaterialCommunityIcons.glyphMap;
 
   return (
     <View style={style}>
-      <Menu
-        visible={menuVisible}
-        onDismiss={closeMenu}
-        anchor={
-          <Pressable onPress={openMenu}>
-            <View pointerEvents="none">
-              <TextInput
-                label={t('vehicleCategory')}
-                value={vehicleCategoryLabel(value)}
-                mode="outlined"
-                editable={false}
-                error={error}
-                left={
-                  <TextInput.Icon
-                    icon={() => (
-                      <MaterialCommunityIcons
-                        name={iconName}
-                        size={24}
-                        color={theme.colors.onSurfaceVariant}
-                      />
-                    )}
+      <Pressable onPress={() => setModalVisible(true)}>
+        <View pointerEvents="none">
+          <TextInput
+            label={t('vehicleCategory')}
+            value={vehicleCategoryLabel(value)}
+            mode="outlined"
+            editable={false}
+            error={error}
+            left={
+              <TextInput.Icon
+                icon={() => (
+                  <MaterialCommunityIcons
+                    name={iconName}
+                    size={24}
+                    color={theme.colors.onSurfaceVariant}
                   />
-                }
-                right={<TextInput.Icon icon="menu-down" />}
+                )}
               />
-            </View>
-          </Pressable>
-        }>
-        {VEHICLE_CATEGORIES.map((category) => (
-          <Menu.Item
-            key={category}
-            title={vehicleCategoryLabel(category)}
-            leadingIcon={vehicleCategoryIcon(category)}
-            onPress={() => selectCategory(category)}
+            }
+            right={<TextInput.Icon icon="menu-down" />}
           />
-        ))}
-      </Menu>
+        </View>
+      </Pressable>
+
       {helperText ? (
         <HelperText type="error" visible={error}>
           {helperText}
         </HelperText>
       ) : null}
+
+      <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={closeModal}>
+        <Pressable style={styles.backdrop} onPress={closeModal}>
+          <Pressable
+            style={[styles.sheet, { backgroundColor: theme.colors.surface }]}
+            onPress={(event) => event.stopPropagation()}>
+            <Text variant="titleMedium" style={styles.title}>
+              {t('vehicleCategory')}
+            </Text>
+            {VEHICLE_CATEGORIES.map((category) => {
+              const selected = category === value;
+              const itemIcon = vehicleCategoryIcon(
+                category,
+              ) as keyof typeof MaterialCommunityIcons.glyphMap;
+
+              return (
+                <Pressable
+                  key={category}
+                  onPress={() => selectCategory(category)}
+                  style={[
+                    styles.row,
+                    selected && { backgroundColor: theme.colors.primaryContainer },
+                  ]}>
+                  <MaterialCommunityIcons
+                    name={itemIcon}
+                    size={24}
+                    color={selected ? theme.colors.primary : theme.colors.onSurfaceVariant}
+                  />
+                  <Text
+                    variant="bodyLarge"
+                    style={selected ? { color: theme.colors.primary } : undefined}>
+                    {vehicleCategoryLabel(category)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+            <Button onPress={closeModal} style={styles.cancel}>
+              {t('cancel')}
+            </Button>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    padding: 24,
+  },
+  sheet: {
+    borderRadius: 12,
+    paddingVertical: 16,
+  },
+  title: {
+    paddingHorizontal: 16,
+    marginBottom: 8,
+  },
+  row: {
+    height: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 16,
+  },
+  cancel: {
+    marginTop: 8,
+    marginHorizontal: 8,
+  },
+});

@@ -1,10 +1,10 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Card, Text, useTheme } from 'react-native-paper';
 
 import { IconCircle, type MciIconName } from '@/components/IconCircle';
+import { LabelText } from '@/components/LabelText';
 import { MutedText } from '@/components/MutedText';
-import { SectionHeader } from '@/components/SectionHeader';
 import { featureCardContentStyle } from '@/constants/card';
 import type { DashboardReminder } from '@/database/reminderRepository';
 import { t } from '@/lib/i18n';
@@ -14,9 +14,43 @@ import {
   reminderTypeLabel,
 } from '@/lib/reminders';
 
+interface NextUpSummaryCardProps {
+  reminders: DashboardReminder[];
+  style?: StyleProp<ViewStyle>;
+}
+
 interface NextUpSectionProps {
   reminders: DashboardReminder[];
   onReminderPress: (reminder: DashboardReminder) => void;
+}
+
+export function NextUpSummaryCard({ reminders, style }: NextUpSummaryCardProps) {
+  const theme = useTheme();
+  const hasReminders = reminders.length > 0;
+
+  return (
+    <Card style={[styles.summaryCard, style]} mode="elevated">
+      <Card.Content style={featureCardContentStyle.content}>
+        <IconCircle
+          name={hasReminders ? 'bell-outline' : 'bell-check-outline'}
+          color={theme.colors.primary}
+          backgroundColor={theme.colors.primaryContainer}
+          size={48}
+          iconSize={24}
+        />
+        <LabelText style={featureCardContentStyle.centeredText}>{t('nextUp')}</LabelText>
+        <Text
+          variant={hasReminders ? 'headlineLarge' : 'titleSmall'}
+          style={[
+            featureCardContentStyle.centeredText,
+            hasReminders ? styles.summaryValue : styles.summaryEmpty,
+          ]}
+          numberOfLines={2}>
+          {hasReminders ? String(reminders.length) : t('noUpcomingReminders')}
+        </Text>
+      </Card.Content>
+    </Card>
+  );
 }
 
 function NextUpItem({
@@ -68,36 +102,19 @@ function NextUpItem({
 }
 
 export function NextUpSection({ reminders, onReminderPress }: NextUpSectionProps) {
-  const theme = useTheme();
+  if (reminders.length === 0) {
+    return null;
+  }
 
   return (
     <View style={styles.section}>
-      <SectionHeader title={t('nextUp')} icon="calendar-clock" />
-
-      {reminders.length === 0 ? (
-        <Card style={styles.emptyCard} mode="elevated">
-          <Card.Content style={featureCardContentStyle.content}>
-            <IconCircle
-              name="bell-check-outline"
-              color={theme.colors.primary}
-              backgroundColor={theme.colors.primaryContainer}
-              size={48}
-              iconSize={24}
-            />
-            <Text variant="titleSmall" style={[featureCardContentStyle.centeredText, styles.emptyTitle]}>
-              {t('noUpcomingReminders')}
-            </Text>
-          </Card.Content>
-        </Card>
-      ) : (
-        reminders.map((reminder) => (
-          <NextUpItem
-            key={reminder.id}
-            reminder={reminder}
-            onPress={() => onReminderPress(reminder)}
-          />
-        ))
-      )}
+      {reminders.map((reminder) => (
+        <NextUpItem
+          key={reminder.id}
+          reminder={reminder}
+          onPress={() => onReminderPress(reminder)}
+        />
+      ))}
     </View>
   );
 }
@@ -125,10 +142,14 @@ const styles = StyleSheet.create({
   dueLabel: {
     textTransform: 'lowercase',
   },
-  emptyCard: {
-    marginBottom: 4,
+  summaryCard: {
+    flex: 1,
+    minWidth: 140,
   },
-  emptyTitle: {
+  summaryValue: {
+    fontWeight: '700',
+  },
+  summaryEmpty: {
     fontWeight: '600',
   },
 });

@@ -30,9 +30,10 @@ export function QuickActionTile({
             name={icon}
             color={color}
             backgroundColor={theme.colors.primaryContainer}
-            size={40}
+            size={32}
+            iconSize={18}
           />
-          <Text variant="titleSmall" style={styles.label} numberOfLines={2}>
+          <Text variant="bodySmall" style={styles.label} numberOfLines={2}>
             {label}
           </Text>
         </Card.Content>
@@ -43,21 +44,22 @@ export function QuickActionTile({
 
 const styles = StyleSheet.create({
   pressable: {
-    flex: 1,
-    minWidth: '45%',
+    width: '48%',
+    alignSelf: 'flex-start',
   },
   pressed: {
     opacity: 0.85,
   },
   card: {
-    flex: 1,
+    width: '100%',
   },
   content: {
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingVertical: 4,
+    padding: 10,
   },
   label: {
-    textAlign: 'center',
+    flex: 1,
   },
 });

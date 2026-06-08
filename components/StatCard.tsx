@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { Card, Text, useTheme } from 'react-native-paper';
 
 import { IconCircle, type MciIconName } from '@/components/IconCircle';
@@ -11,14 +11,15 @@ interface StatCardProps {
   icon?: MciIconName;
   accentColor?: string;
   onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
 }
 
-export function StatCard({ label, value, icon, accentColor, onPress }: StatCardProps) {
+export function StatCard({ label, value, icon, accentColor, onPress, style }: StatCardProps) {
   const theme = useTheme();
   const color = accentColor ?? theme.colors.primary;
 
   return (
-    <Card style={styles.card} mode="elevated" onPress={onPress}>
+    <Card style={[styles.card, style]} mode="elevated" onPress={onPress}>
       <Card.Content style={featureCardContentStyle.content}>
         {icon ? (
           <IconCircle

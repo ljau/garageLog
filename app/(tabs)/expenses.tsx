@@ -90,7 +90,7 @@ export default function ExpenseSummaryScreen() {
           />
         </View>
 
-        <Card mode="outlined" style={styles.periodCard}>
+        <Card mode="elevated" style={styles.periodCard}>
           <Card.Content style={styles.periodContent}>
             <InfoHint
               icon="calendar-month"

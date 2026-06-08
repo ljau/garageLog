@@ -5,7 +5,7 @@ import { Button } from 'react-native-paper';
 
 import { screenScrollContentStyle } from '@/constants/screen';
 import { EmptyState } from '@/components/EmptyState';
-import { NextUpSection } from '@/components/NextUpSection';
+import { NextUpSection, NextUpSummaryCard } from '@/components/NextUpSection';
 import { ScreenBottomActions } from '@/components/ScreenBottomActions';
 import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedScreen } from '@/components/ThemedScreen';
@@ -18,7 +18,6 @@ import { getVehicleStats } from '@/database/vehicleRepository';
 import { useDashboardReminders } from '@/hooks/useDashboardReminders';
 import { useFormSheet } from '@/hooks/useFormSheet';
 import { useRecentVehicles } from '@/hooks/useVehicles';
-import { formatMileage } from '@/lib/format';
 import { t } from '@/lib/i18n';
 import { useAppNavigation } from '@/lib/navigation';
 import { useDatabase } from '@/providers/DatabaseProvider';
@@ -58,14 +57,6 @@ export default function DashboardScreen() {
   );
 
   const goToVehicles = () => navigateTo('/vehicles');
-  const goToAverageMileage = () => {
-    if (vehicles.length === 1) {
-      navigateTo(`/vehicles/${vehicles[0].id}`);
-      return;
-    }
-
-    goToVehicles();
-  };
   const goToReminder = (reminder: DashboardReminder) =>
     navigateTo(`/vehicles/${reminder.vehicleId}/reminders/${reminder.id}/edit`);
 
@@ -101,23 +92,17 @@ export default function DashboardScreen() {
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={screenScrollContentStyle}>
-        <View style={styles.statsRow}>
+        <View style={styles.summaryRow}>
           <StatCard
             label={t('totalVehicles')}
             value={String(stats.total)}
             icon="car-multiple"
             onPress={goToVehicles}
+            style={stats.total === 0 ? styles.fullWidthCard : undefined}
           />
-          <StatCard
-            label={t('averageMileage')}
-            value={
-              stats.total > 0
-                ? `${formatMileage(stats.averageMileage)} ${t('mileageUnit')}`
-                : '—'
-            }
-            icon="speedometer"
-            onPress={goToAverageMileage}
-          />
+          {stats.total > 0 ? (
+            <NextUpSummaryCard reminders={dashboardReminders} />
+          ) : null}
         </View>
 
         {stats.total > 0 ? (
@@ -175,9 +160,14 @@ const styles = StyleSheet.create({
   scroll: {
     flex: 1,
   },
-  statsRow: {
+  summaryRow: {
     flexDirection: 'row',
+    alignItems: 'stretch',
     gap: 12,
     marginBottom: 24,
+  },
+  fullWidthCard: {
+    width: '100%',
+    flex: 0,
   },
 });

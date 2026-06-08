@@ -89,7 +89,9 @@ export default function VehicleDetailScreen() {
     <>
       <Stack.Screen options={{ title: displayName }} />
       <ThemedScreen>
-        <ScrollView style={styles.scroll} contentContainerStyle={screenScrollContentStyle}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={[screenScrollContentStyle, styles.scrollContent]}>
           <Card style={styles.heroCard} mode="elevated">
             <Card.Content style={styles.heroContent}>
               <IconCircle
@@ -226,6 +228,10 @@ const styles = StyleSheet.create({
   scroll: {
     flex: 1,
   },
+  scrollContent: {
+    flexGrow: 0,
+    paddingBottom: 16,
+  },
   heroCard: {
     marginBottom: 16,
   },
@@ -247,8 +253,8 @@ const styles = StyleSheet.create({
   actionGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 8,
+    alignItems: 'flex-start',
+    gap: 10,
   },
   error: {
     color: '#B00020',
