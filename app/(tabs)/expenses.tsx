@@ -1,11 +1,16 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
 import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Card, Divider, List, Text } from 'react-native-paper';
+import { Card, Text, useTheme } from 'react-native-paper';
 
 import { EmptyState } from '@/components/EmptyState';
+import { IconCircle } from '@/components/IconCircle';
+import { InfoHint } from '@/components/InfoHint';
+import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedScreen } from '@/components/ThemedScreen';
 import { LoadingState } from '@/components/LoadingState';
+import { LabelText } from '@/components/LabelText';
 import { MutedText } from '@/components/MutedText';
 import { StatCard } from '@/components/StatCard';
 import { screenContentContainerStyle } from '@/constants/screen';
@@ -16,6 +21,7 @@ import { useDatabase } from '@/providers/DatabaseProvider';
 
 export default function ExpenseSummaryScreen() {
   const router = useRouter();
+  const theme = useTheme();
   const { status, error: dbError } = useDatabase();
   const { summary, byVehicle, isLoading, error } = useExpenseSummary();
 
@@ -33,12 +39,19 @@ export default function ExpenseSummaryScreen() {
       <EmptyState
         title={t('databaseError')}
         description={dbError?.message ?? t('databaseError')}
+        icon="database-alert"
       />
     );
   }
 
   if (error) {
-    return <EmptyState title={t('databaseError')} description={error.message} />;
+    return (
+      <EmptyState
+        title={t('databaseError')}
+        description={error.message}
+        icon="database-alert"
+      />
+    );
   }
 
   return (
@@ -46,72 +59,97 @@ export default function ExpenseSummaryScreen() {
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={screenContentContainerStyle}>
-      <Text variant="headlineSmall" style={styles.heading}>
-        {t('expenseSummary')}
-      </Text>
+        <Card style={styles.totalCard} mode="elevated">
+          <Card.Content style={styles.totalContent}>
+            <IconCircle
+              name="wallet-outline"
+              color={theme.colors.primary}
+              backgroundColor={theme.colors.primaryContainer}
+              size={64}
+              iconSize={32}
+            />
+            <View style={styles.totalText}>
+              <LabelText>{t('totalExpenses')}</LabelText>
+              <Text variant="displaySmall" style={styles.totalValue}>
+                {formatCost(summary.total)}
+              </Text>
+            </View>
+          </Card.Content>
+        </Card>
 
-      <Card style={styles.totalCard} mode="elevated">
-        <Card.Content>
-          <MutedText variant="labelLarge">{t('totalExpenses')}</MutedText>
-          <Text variant="displaySmall" style={styles.totalValue}>
-            {formatCost(summary.total)}
-          </Text>
-        </Card.Content>
-      </Card>
+        <View style={styles.statsRow}>
+          <StatCard
+            label={t('monthlyExpenses')}
+            value={formatCost(summary.monthly)}
+            icon="calendar-month"
+          />
+          <StatCard
+            label={t('yearlyExpenses')}
+            value={formatCost(summary.yearly)}
+            icon="calendar-range"
+          />
+        </View>
 
-      <View style={styles.statsRow}>
-        <StatCard
-          label={t('monthlyExpenses')}
-          value={formatCost(summary.monthly)}
-        />
-        <StatCard label={t('yearlyExpenses')} value={formatCost(summary.yearly)} />
-      </View>
+        <Card mode="outlined" style={styles.periodCard}>
+          <Card.Content style={styles.periodContent}>
+            <InfoHint
+              icon="calendar-month"
+              text={t('monthlyExpensesPeriod', { period: currentMonthLabel })}
+            />
+            <InfoHint
+              icon="calendar-range"
+              text={t('yearlyExpensesPeriod', { period: currentYearLabel })}
+            />
+          </Card.Content>
+        </Card>
 
-      <MutedText variant="bodySmall" style={styles.periodHint}>
-        {t('monthlyExpensesPeriod', { period: currentMonthLabel })}
-      </MutedText>
-      <MutedText variant="bodySmall" style={styles.periodHintYear}>
-        {t('yearlyExpensesPeriod', { period: currentYearLabel })}
-      </MutedText>
+        <SectionHeader title={t('expensesByVehicle')} icon="car-multiple" />
 
-      <View style={styles.sectionHeader}>
-        <Text variant="titleMedium">{t('expensesByVehicle')}</Text>
-      </View>
-
-      {!hasAnyExpenses ? (
-        <EmptyState
-          embedded
-          title={t('noExpensesYet')}
-          description={t('noExpensesDescription')}
-        />
-      ) : vehiclesWithExpenses.length === 0 ? (
-        <MutedText variant="bodyMedium">{t('noVehicleExpenses')}</MutedText>
-      ) : (
-        <Card mode="outlined">
-          {vehiclesWithExpenses.map((item, index) => (
-            <View key={item.vehicleId}>
-              {index > 0 ? <Divider /> : null}
-              <List.Item
-                title={formatVehicleDisplayName(item)}
-                description={
-                  item.nickname?.trim()
-                    ? formatVehicleTitle(item.brand, item.model, item.year)
-                    : undefined
-                }
+        {!hasAnyExpenses ? (
+          <EmptyState embedded title={t('noExpensesYet')} icon="cash-remove" />
+        ) : vehiclesWithExpenses.length === 0 ? (
+          <MutedText variant="bodyMedium">{t('noVehicleExpenses')}</MutedText>
+        ) : (
+          <View style={styles.vehicleList}>
+            {vehiclesWithExpenses.map((item) => (
+              <Card
+                key={item.vehicleId}
+                style={styles.vehicleRow}
                 onPress={() => router.push(`/vehicles/${item.vehicleId}/maintenance`)}
-                right={() => (
-                  <View style={styles.listAmount}>
-                    <Text variant="titleMedium">{formatCost(item.total)}</Text>
-                    <MutedText variant="bodySmall">
+                mode="elevated">
+                <Card.Content style={styles.vehicleRowContent}>
+                  <IconCircle
+                    name="car"
+                    color={theme.colors.primary}
+                    backgroundColor={theme.colors.primaryContainer}
+                    size={40}
+                  />
+                  <View style={styles.vehicleInfo}>
+                    <Text variant="titleMedium" numberOfLines={1}>
+                      {formatVehicleDisplayName(item)}
+                    </Text>
+                    {item.nickname?.trim() ? (
+                      <MutedText variant="bodyMedium" numberOfLines={1}>
+                        {formatVehicleTitle(item.brand, item.model, item.year)}
+                      </MutedText>
+                    ) : null}
+                    <MutedText variant="bodyMedium">
                       {t('expenseRecordCount', { count: String(item.recordCount) })}
                     </MutedText>
                   </View>
-                )}
-              />
-            </View>
-          ))}
-        </Card>
-      )}
+                  <View style={styles.listAmount}>
+                    <Text variant="titleMedium">{formatCost(item.total)}</Text>
+                  </View>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={22}
+                    color={theme.colors.onSurfaceVariant}
+                  />
+                </Card.Content>
+              </Card>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </ThemedScreen>
   );
@@ -121,28 +159,46 @@ const styles = StyleSheet.create({
   scroll: {
     flex: 1,
   },
-  heading: {
-    marginBottom: 16,
-  },
   totalCard: {
     marginBottom: 16,
   },
+  totalContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  totalText: {
+    flex: 1,
+  },
   totalValue: {
     marginTop: 4,
+    fontWeight: '700',
   },
   statsRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 4,
+    marginBottom: 12,
   },
-  periodHint: {
-    marginBottom: 2,
-  },
-  periodHintYear: {
+  periodCard: {
     marginBottom: 24,
   },
-  sectionHeader: {
-    marginBottom: 12,
+  periodContent: {
+    gap: 12,
+  },
+  vehicleList: {
+    gap: 8,
+  },
+  vehicleRow: {
+    marginBottom: 0,
+  },
+  vehicleRowContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  vehicleInfo: {
+    flex: 1,
+    gap: 2,
   },
   listAmount: {
     alignItems: 'flex-end',

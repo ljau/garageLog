@@ -5,9 +5,7 @@ import {
   type MD3Theme,
 } from 'react-native-paper';
 
-const fontConfig = {
-  fontFamily: 'System',
-} as const;
+import { appFontConfig } from '@/constants/typography';
 
 const sharedColors = {
   primary: '#1565C0',
@@ -25,7 +23,7 @@ export const lightTheme: MD3Theme = {
     primaryContainer: '#BBDEFB',
     secondaryContainer: '#CFD8DC',
   },
-  fonts: configureFonts({ config: fontConfig }),
+  fonts: configureFonts({ config: appFontConfig, isV3: true }),
 };
 
 export const darkTheme: MD3Theme = {
@@ -39,5 +37,5 @@ export const darkTheme: MD3Theme = {
     primaryContainer: '#0D47A1',
     secondaryContainer: '#37474F',
   },
-  fonts: configureFonts({ config: fontConfig }),
+  fonts: configureFonts({ config: appFontConfig, isV3: true }),
 };

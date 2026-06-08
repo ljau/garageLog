@@ -21,7 +21,13 @@ export default function VehiclesScreen() {
   }
 
   if (error) {
-    return <EmptyState title={t('databaseError')} description={error.message} />;
+    return (
+      <EmptyState
+        title={t('databaseError')}
+        description={error.message}
+        icon="database-alert"
+      />
+    );
   }
 
   return (
@@ -45,8 +51,7 @@ export default function VehiclesScreen() {
             embedded
             title={t('noVehiclesYet')}
             description={t('noVehiclesDescription')}
-            actionLabel={t('addVehicle')}
-            onAction={() => router.push('/vehicles/add')}
+            icon="car-outline"
           />
         }
       />

@@ -1,13 +1,23 @@
 import { StyleSheet } from 'react-native';
-import { ActivityIndicator, Text } from 'react-native-paper';
+import { ActivityIndicator, Text, useTheme } from 'react-native-paper';
 
+import { IconCircle } from '@/components/IconCircle';
 import { ThemedScreen } from '@/components/ThemedScreen';
 import { t } from '@/lib/i18n';
 
 export function LoadingState() {
+  const theme = useTheme();
+
   return (
     <ThemedScreen style={styles.container}>
-      <ActivityIndicator animating size="large" />
+      <IconCircle
+        name="garage"
+        color={theme.colors.primary}
+        backgroundColor={theme.colors.primaryContainer}
+        size={64}
+        iconSize={32}
+      />
+      <ActivityIndicator animating size="large" style={styles.spinner} />
       <Text variant="bodyLarge" style={styles.text}>
         {t('loading')}
       </Text>
@@ -22,7 +32,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 24,
   },
+  spinner: {
+    marginTop: 20,
+  },
   text: {
-    marginTop: 16,
+    marginTop: 12,
   },
 });

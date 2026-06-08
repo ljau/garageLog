@@ -1,5 +1,6 @@
 const en = {
   appName: 'GarageLog',
+  dashboardTagline: 'Track vehicles, maintenance, and reminders in one place.',
   dashboard: 'Dashboard',
   vehicles: 'Vehicles',
   addVehicle: 'Add Vehicle',
@@ -52,6 +53,7 @@ const en = {
   cancel: 'Cancel',
   delete: 'Delete',
   edit: 'Edit',
+  quickActions: 'Quick actions',
   addedOn: 'Added on',
   loading: 'Loading…',
   databaseError: 'Could not load data. Please restart the app.',
@@ -120,12 +122,11 @@ const en = {
   totalExpenses: 'Total expenses',
   monthlyExpenses: 'This month',
   yearlyExpenses: 'This year',
-  monthlyExpensesPeriod: 'Based on maintenance in {period}',
-  yearlyExpensesPeriod: 'Calendar year {period}',
+  monthlyExpensesPeriod: '{period}',
+  yearlyExpensesPeriod: '{period}',
   expensesByVehicle: 'Expenses by vehicle',
   noExpensesYet: 'No expenses recorded',
-  noExpensesDescription:
-    'Add maintenance records with a cost to see your expense summary here.',
+  noExpensesDescription: 'Log maintenance costs to get started.',
   noVehicleExpenses: 'No vehicle has logged costs yet.',
   expenseRecordCount: '{count} records',
 } as const;

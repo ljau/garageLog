@@ -1,12 +1,14 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Text } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 
 import { screenScrollContentStyle } from '@/constants/screen';
+import { DashboardHero } from '@/components/DashboardHero';
 import { EmptyState } from '@/components/EmptyState';
 import { NextUpSection } from '@/components/NextUpSection';
 import { ScreenBottomActions } from '@/components/ScreenBottomActions';
+import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedScreen } from '@/components/ThemedScreen';
 import { LoadingState } from '@/components/LoadingState';
 import { StatCard } from '@/components/StatCard';
@@ -54,6 +56,14 @@ export default function DashboardScreen() {
 
   const goToAddVehicle = () => router.push('/vehicles/add');
   const goToVehicles = () => router.push('/(tabs)/vehicles');
+  const goToAverageMileage = () => {
+    if (vehicles.length === 1) {
+      router.push(`/vehicles/${vehicles[0].id}`);
+      return;
+    }
+
+    goToVehicles();
+  };
   const goToReminder = (reminder: DashboardReminder) =>
     router.push(`/vehicles/${reminder.vehicleId}/reminders/${reminder.id}/edit`);
 
@@ -69,12 +79,19 @@ export default function DashboardScreen() {
       <EmptyState
         title={t('databaseError')}
         description={dbError?.message ?? t('databaseError')}
+        icon="database-alert"
       />
     );
   }
 
   if (error) {
-    return <EmptyState title={t('databaseError')} description={error.message} />;
+    return (
+      <EmptyState
+        title={t('databaseError')}
+        description={error.message}
+        icon="database-alert"
+      />
+    );
   }
 
   return (
@@ -82,55 +99,57 @@ export default function DashboardScreen() {
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={screenScrollContentStyle}>
-      <Text variant="headlineSmall" style={styles.heading}>
-        {t('appName')}
-      </Text>
+        <DashboardHero />
 
-      <View style={styles.statsRow}>
-        <StatCard label={t('totalVehicles')} value={String(stats.total)} />
-        <StatCard
-          label={t('averageMileage')}
-          value={
-            stats.total > 0
-              ? `${formatMileage(stats.averageMileage)} ${t('mileageUnit')}`
-              : '—'
-          }
-        />
-      </View>
-
-      {stats.total > 0 ? (
-        <NextUpSection
-          reminders={dashboardReminders}
-          onReminderPress={goToReminder}
-        />
-      ) : null}
-
-      <View style={styles.sectionHeader}>
-        <Text variant="titleMedium">{t('recentVehicles')}</Text>
-        {stats.total > 0 ? (
-          <Button compact onPress={goToVehicles}>
-            {t('viewAllVehicles')}
-          </Button>
-        ) : null}
-      </View>
-
-      {vehicles.length === 0 ? (
-        <EmptyState
-          embedded
-          title={t('noVehiclesYet')}
-          description={t('noVehiclesDescription')}
-          actionLabel={t('addVehicle')}
-          onAction={goToAddVehicle}
-        />
-      ) : (
-        vehicles.map((vehicle) => (
-          <VehicleCard
-            key={vehicle.id}
-            vehicle={vehicle}
-            onPress={() => router.push(`/vehicles/${vehicle.id}`)}
+        <View style={styles.statsRow}>
+          <StatCard
+            label={t('totalVehicles')}
+            value={String(stats.total)}
+            icon="car-multiple"
+            onPress={goToVehicles}
           />
-        ))
-      )}
+          <StatCard
+            label={t('averageMileage')}
+            value={
+              stats.total > 0
+                ? `${formatMileage(stats.averageMileage)} ${t('mileageUnit')}`
+                : '—'
+            }
+            icon="speedometer"
+            onPress={goToAverageMileage}
+          />
+        </View>
+
+        {stats.total > 0 ? (
+          <NextUpSection
+            reminders={dashboardReminders}
+            onReminderPress={goToReminder}
+          />
+        ) : null}
+
+        <SectionHeader
+          title={t('recentVehicles')}
+          icon="history"
+          actionLabel={stats.total > 0 ? t('viewAllVehicles') : undefined}
+          onAction={stats.total > 0 ? goToVehicles : undefined}
+        />
+
+        {vehicles.length === 0 ? (
+          <EmptyState
+            embedded
+            title={t('noVehiclesYet')}
+            description={t('noVehiclesDescription')}
+            icon="car-outline"
+          />
+        ) : (
+          vehicles.map((vehicle) => (
+            <VehicleCard
+              key={vehicle.id}
+              vehicle={vehicle}
+              onPress={() => router.push(`/vehicles/${vehicle.id}`)}
+            />
+          ))
+        )}
       </ScrollView>
 
       <ScreenBottomActions>
@@ -146,18 +165,9 @@ const styles = StyleSheet.create({
   scroll: {
     flex: 1,
   },
-  heading: {
-    marginBottom: 16,
-  },
   statsRow: {
     flexDirection: 'row',
     gap: 12,
     marginBottom: 24,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
   },
 });

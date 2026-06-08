@@ -66,6 +66,7 @@ export default function RemindersScreen() {
               embedded
               title={t('noRemindersYet')}
               description={t('noRemindersDescription')}
+              icon="bell-outline"
             />
           }
         />

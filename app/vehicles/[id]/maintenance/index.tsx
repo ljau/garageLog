@@ -66,6 +66,7 @@ export default function MaintenanceHistoryScreen() {
               embedded
               title={t('noMaintenanceYet')}
               description={t('noMaintenanceDescription')}
+              icon="wrench-outline"
             />
           }
         />

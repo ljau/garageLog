@@ -4,6 +4,7 @@ import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-fo
 import { StyleSheet } from 'react-native';
 import { Button, HelperText, SegmentedButtons, Text, TextInput } from 'react-native-paper';
 
+import { LabelText } from '@/components/LabelText';
 import { DateTimePickerField } from '@/components/pickers/DateTimePickerField';
 import { reminderTypeLabel } from '@/lib/reminders';
 import { t } from '@/lib/i18n';
@@ -68,9 +69,7 @@ export function ReminderFormFields() {
 
   return (
     <>
-      <Text variant="labelLarge" style={styles.label}>
-        {t('reminderType')}
-      </Text>
+      <LabelText style={styles.label}>{t('reminderType')}</LabelText>
       <Controller
         control={control}
         name="type"

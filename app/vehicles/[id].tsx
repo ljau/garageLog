@@ -1,12 +1,14 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Divider, Snackbar, Text, useTheme } from 'react-native-paper';
+import { Button, Card, Snackbar, Text, useTheme } from 'react-native-paper';
 
 import { ThemedScreen } from '@/components/ThemedScreen';
 import { DeleteVehicleDialog } from '@/components/DeleteVehicleDialog';
+import { DetailInfoRow } from '@/components/DetailInfoRow';
+import { IconCircle, type MciIconName } from '@/components/IconCircle';
 import { MutedText } from '@/components/MutedText';
+import { QuickActionTile } from '@/components/QuickActionTile';
 import { ScreenBottomActions } from '@/components/ScreenBottomActions';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
@@ -66,6 +68,7 @@ export default function VehicleDetailScreen() {
         <EmptyState
           title={t('vehicleNotFound')}
           description={error?.message ?? t('vehicleNotFound')}
+          icon="car-off"
         />
       </>
     );
@@ -74,92 +77,99 @@ export default function VehicleDetailScreen() {
   const title = formatVehicleTitle(vehicle.brand, vehicle.model, vehicle.year);
   const displayName = formatVehicleDisplayName(vehicle);
   const hasNickname = !!vehicle.nickname?.trim();
-  const categoryIcon = vehicleCategoryIcon(
-    vehicle.category,
-  ) as keyof typeof MaterialCommunityIcons.glyphMap;
+  const categoryIcon = vehicleCategoryIcon(vehicle.category) as MciIconName;
 
   return (
     <>
       <Stack.Screen options={{ title: displayName }} />
       <ThemedScreen>
         <ScrollView style={styles.scroll} contentContainerStyle={screenScrollContentStyle}>
-        <Text variant="headlineSmall">{displayName}</Text>
-        {hasNickname ? (
-          <MutedText variant="titleMedium" style={styles.subtitle}>
-            {title}
-          </MutedText>
-        ) : null}
+          <Card style={styles.heroCard} mode="elevated">
+            <Card.Content style={styles.heroContent}>
+              <IconCircle
+                name={categoryIcon}
+                color={theme.colors.onPrimaryContainer}
+                backgroundColor={theme.colors.primary}
+                size={64}
+                iconSize={34}
+              />
+              <View style={styles.heroText}>
+                <Text variant="headlineSmall">{displayName}</Text>
+                {hasNickname ? (
+                  <MutedText variant="titleMedium">{title}</MutedText>
+                ) : null}
+                <MutedText variant="bodyMedium">
+                  {vehicleCategoryLabel(vehicle.category)}
+                </MutedText>
+              </View>
+            </Card.Content>
+          </Card>
 
-        <Divider style={styles.divider} />
+          <Card style={styles.detailsCard} mode="outlined">
+            <Card.Content>
+              <DetailInfoRow icon="factory" label={t('brand')} value={vehicle.brand} />
+              <DetailInfoRow icon="car-info" label={t('model')} value={vehicle.model} />
+              <DetailInfoRow icon="calendar" label={t('year')} value={String(vehicle.year)} />
+              <DetailInfoRow
+                icon="speedometer"
+                label={t('currentMileage')}
+                value={`${formatMileage(vehicle.currentMileage)} ${t('mileageUnit')}`}
+              />
+              {vehicle.plateNumber ? (
+                <DetailInfoRow
+                  icon="card-text-outline"
+                  label={t('plateNumber')}
+                  value={vehicle.plateNumber}
+                />
+              ) : null}
+              <DetailInfoRow
+                icon="calendar-plus"
+                label={t('addedOn')}
+                value={formatDate(vehicle.createdAt)}
+              />
+            </Card.Content>
+          </Card>
 
-        <View style={styles.detailRow}>
-          <MutedText variant="labelLarge">{t('vehicleCategory')}</MutedText>
-          <View style={styles.categoryValue}>
-            <MaterialCommunityIcons
-              name={categoryIcon}
-              size={20}
-              color={theme.colors.primary}
-            />
-            <Text variant="bodyLarge" style={styles.categoryLabel}>
-              {vehicleCategoryLabel(vehicle.category)}
-            </Text>
-          </View>
-        </View>
-        <View style={styles.detailRow}>
-          <MutedText variant="labelLarge">{t('brand')}</MutedText>
-          <Text variant="bodyLarge">{vehicle.brand}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <MutedText variant="labelLarge">{t('model')}</MutedText>
-          <Text variant="bodyLarge">{vehicle.model}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <MutedText variant="labelLarge">{t('year')}</MutedText>
-          <Text variant="bodyLarge">{String(vehicle.year)}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <MutedText variant="labelLarge">{t('currentMileage')}</MutedText>
-          <Text variant="bodyLarge">
-            {formatMileage(vehicle.currentMileage)} {t('mileageUnit')}
+          <Text variant="titleMedium" style={styles.actionsHeading}>
+            {t('quickActions')}
           </Text>
-        </View>
-        {vehicle.plateNumber ? (
-          <View style={styles.detailRow}>
-            <MutedText variant="labelLarge">{t('plateNumber')}</MutedText>
-            <Text variant="bodyLarge">{vehicle.plateNumber}</Text>
+          <View style={styles.actionGrid}>
+            <QuickActionTile
+              icon="wrench"
+              label={t('viewMaintenanceHistory')}
+              onPress={() => router.push(`/vehicles/${vehicle.id}/maintenance`)}
+            />
+            <QuickActionTile
+              icon="bell-outline"
+              label={t('viewReminders')}
+              onPress={() => router.push(`/vehicles/${vehicle.id}/reminders`)}
+            />
+            <QuickActionTile
+              icon="pencil-outline"
+              label={t('edit')}
+              onPress={() => router.push(`/vehicles/${vehicle.id}/edit`)}
+            />
+            <QuickActionTile
+              icon="delete-outline"
+              label={t('deleteVehicle')}
+              onPress={() => setDeleteDialogVisible(true)}
+              accentColor={theme.colors.error}
+            />
           </View>
-        ) : null}
-        <View style={styles.detailRow}>
-          <MutedText variant="labelLarge">{t('addedOn')}</MutedText>
-          <Text variant="bodyLarge">{formatDate(vehicle.createdAt)}</Text>
-        </View>
         </ScrollView>
 
         <ScreenBottomActions>
           <Button
-            mode="contained-tonal"
-            icon="wrench"
-            onPress={() => router.push(`/vehicles/${vehicle.id}/maintenance`)}>
-            {t('viewMaintenanceHistory')}
-          </Button>
-          <Button
-            mode="contained-tonal"
-            icon="bell"
-            onPress={() => router.push(`/vehicles/${vehicle.id}/reminders`)}>
-            {t('viewReminders')}
-          </Button>
-          <Button
             mode="contained"
-            icon="pencil"
-            onPress={() => router.push(`/vehicles/${vehicle.id}/edit`)}>
-            {t('edit')}
+            icon="wrench"
+            onPress={() => router.push(`/vehicles/${vehicle.id}/maintenance/add`)}>
+            {t('addMaintenance')}
           </Button>
           <Button
-            mode="outlined"
-            icon="delete"
-            textColor="#B00020"
-            onPress={() => setDeleteDialogVisible(true)}>
-            {t('deleteVehicle')}
+            mode="contained-tonal"
+            icon="bell-plus-outline"
+            onPress={() => router.push(`/vehicles/${vehicle.id}/reminders/add`)}>
+            {t('addReminder')}
           </Button>
 
           {deleteError ? (
@@ -193,24 +203,29 @@ const styles = StyleSheet.create({
   scroll: {
     flex: 1,
   },
-  subtitle: {
-    marginTop: 4,
+  heroCard: {
+    marginBottom: 16,
   },
-  divider: {
-    marginVertical: 16,
-  },
-  detailRow: {
+  heroContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 16,
+  },
+  heroText: {
+    flex: 1,
+    gap: 2,
+  },
+  detailsCard: {
+    marginBottom: 20,
+  },
+  actionsHeading: {
     marginBottom: 12,
   },
-  categoryValue: {
+  actionGrid: {
     flexDirection: 'row',
-    alignItems: 'center',
-  },
-  categoryLabel: {
-    marginLeft: 6,
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 8,
   },
   error: {
     color: '#B00020',
