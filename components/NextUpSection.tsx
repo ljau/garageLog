@@ -87,9 +87,6 @@ export function NextUpSection({ reminders, onReminderPress }: NextUpSectionProps
             <Text variant="titleSmall" style={[featureCardContentStyle.centeredText, styles.emptyTitle]}>
               {t('noUpcomingReminders')}
             </Text>
-            <MutedText variant="bodyMedium" style={featureCardContentStyle.centeredText}>
-              {t('noUpcomingRemindersDescription')}
-            </MutedText>
           </Card.Content>
         </Card>
       ) : (

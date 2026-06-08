@@ -1,21 +1,25 @@
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { FlatList, StyleSheet } from 'react-native';
 import { PrimaryFab } from '@/components/PrimaryFab';
 import { ThemedScreen } from '@/components/ThemedScreen';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
 import { ReminderCard } from '@/components/ReminderCard';
+import { AddReminderSheet } from '@/components/sheets/AddReminderSheet';
 import { useFabLayout } from '@/hooks/useFabLayout';
+import { useFormSheet } from '@/hooks/useFormSheet';
 import { useReminders } from '@/hooks/useReminders';
 import { useVehicle } from '@/hooks/useVehicle';
 import { t } from '@/lib/i18n';
+import { useAppNavigation } from '@/lib/navigation';
 
 export default function RemindersScreen() {
-  const router = useRouter();
+  const { navigateTo } = useAppNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { vehicle, isLoading: vehicleLoading, error: vehicleError } = useVehicle(id);
-  const { reminders, isLoading: remindersLoading, error: remindersError } =
+  const { reminders, isLoading: remindersLoading, error: remindersError, reload } =
     useReminders(id);
+  const addReminderSheet = useFormSheet();
   const { fabStyle, listPaddingBottom } = useFabLayout();
 
   const isLoading = vehicleLoading || remindersLoading;
@@ -57,7 +61,7 @@ export default function RemindersScreen() {
             <ReminderCard
               reminder={item}
               onPress={() =>
-                router.push(`/vehicles/${vehicle.id}/reminders/${item.id}/edit`)
+                navigateTo(`/vehicles/${vehicle.id}/reminders/${item.id}/edit`)
               }
             />
           )}
@@ -74,8 +78,16 @@ export default function RemindersScreen() {
         <PrimaryFab
           icon="plus"
           style={fabStyle}
-          onPress={() => router.push(`/vehicles/${vehicle.id}/reminders/add`)}
+          onPress={addReminderSheet.open}
           label={t('addReminder')}
+        />
+
+        <AddReminderSheet
+          visible={addReminderSheet.visible}
+          formKey={addReminderSheet.formKey}
+          vehicleId={vehicle.id}
+          onDismiss={addReminderSheet.close}
+          onSaved={() => void reload()}
         />
       </ThemedScreen>
     </>

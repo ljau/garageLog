@@ -1,5 +1,8 @@
 import * as SQLite from 'expo-sqlite';
 
+import { migrations } from '@/database/migrations';
+import { runMigrations } from '@/database/migrations/runner';
+
 const DATABASE_NAME = 'garagelog.db';
 
 const SCHEMA_SQL = `
@@ -44,17 +47,6 @@ const SCHEMA_SQL = `
 
 let database: SQLite.SQLiteDatabase | null = null;
 
-async function migrateDatabase(db: SQLite.SQLiteDatabase): Promise<void> {
-  const columns = await db.getAllAsync<{ name: string }>(`PRAGMA table_info(vehicles)`);
-  const hasCategory = columns.some((column) => column.name === 'category');
-
-  if (!hasCategory) {
-    await db.execAsync(
-      `ALTER TABLE vehicles ADD COLUMN category TEXT NOT NULL DEFAULT 'car';`,
-    );
-  }
-}
-
 export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
   if (database) {
     return database;
@@ -62,7 +54,7 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
 
   const db = await SQLite.openDatabaseAsync(DATABASE_NAME);
   await db.execAsync(SCHEMA_SQL);
-  await migrateDatabase(db);
+  await runMigrations(db, migrations);
   database = db;
   return db;
 }

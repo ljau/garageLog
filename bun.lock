@@ -7,7 +7,9 @@
       "dependencies": {
         "@expo/vector-icons": "^15.1.1",
         "@hookform/resolvers": "^5.4.0",
+        "@meterapp/vehicle-db": "^2.3.0",
         "@react-native-community/datetimepicker": "9.1.0",
+        "auto-parts-db": "^2.0.0",
         "dayjs": "^1.11.21",
         "expo": "~56.0.8",
         "expo-constants": "~56.0.16",
@@ -278,6 +280,8 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
+    "@meterapp/vehicle-db": ["@meterapp/vehicle-db@2.3.0", "", {}, "sha512-02mejasirsVA8h5bI54iut37qcH4hjJ1Tb/J3QIjxaPYsoYEhqs+FPxGhOGLPqjxeibt6Vl4sXw2zsJYRiSJTA=="],
+
     "@msgpackr-extract/msgpackr-extract-darwin-arm64": ["@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.4", "", { "os": "darwin", "cpu": "arm64" }, "sha512-LCkGo6JDfaBhgST7UpPWgNgLINpcpabaHfyz5OBx75nUYxBsaEPxjnyNjWpeb/xBup/682QnBfRBy2/LvPutZQ=="],
 
     "@msgpackr-extract/msgpackr-extract-darwin-x64": ["@msgpackr-extract/msgpackr-extract-darwin-x64@3.0.4", "", { "os": "darwin", "cpu": "x64" }, "sha512-zExlW9zUJKZH/tOtVMttwjKa4Xm/3KcNjnE3dPN92uCktwavMxpgCA3MoJK/DOnTWsQgo224OaST27/mPNAf+w=="],
@@ -421,6 +425,8 @@
     "aria-query": ["aria-query@5.3.2", "", {}, "sha512-COROpnaoap1E2F000S62r6A60uHZnmlvomhfyT2DlTcrY1OrBKn2UhH7qn5wTC9zMvD0AY7csdPSNwKP+7WiQw=="],
 
     "asap": ["asap@2.0.6", "", {}, "sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA=="],
+
+    "auto-parts-db": ["auto-parts-db@2.0.0", "", {}, "sha512-s+/uTJsODPQr6pTawoF9VnkUdAG+/Kkj66Ov6SKEoU0Hr8frzGHqWvccgIXPz8N3MJJ0I2GkkfbBuF6jPEldOQ=="],
 
     "await-lock": ["await-lock@2.2.2", "", {}, "sha512-aDczADvlvTGajTDjcjpJMqRkOF6Qdz3YbPZm/PyW6tKPkx2hlYBzxMhEywM/tU72HrVZjgl5VCdRuMlA7pZ8Gw=="],
 

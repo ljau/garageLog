@@ -1,6 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
-import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Card, Text, useTheme } from 'react-native-paper';
 
@@ -17,10 +16,11 @@ import { screenContentContainerStyle } from '@/constants/screen';
 import { useExpenseSummary } from '@/hooks/useExpenseSummary';
 import { formatCost, formatVehicleDisplayName, formatVehicleTitle } from '@/lib/format';
 import { t } from '@/lib/i18n';
+import { useAppNavigation } from '@/lib/navigation';
 import { useDatabase } from '@/providers/DatabaseProvider';
 
 export default function ExpenseSummaryScreen() {
-  const router = useRouter();
+  const { navigateTo } = useAppNavigation();
   const theme = useTheme();
   const { status, error: dbError } = useDatabase();
   const { summary, byVehicle, isLoading, error } = useExpenseSummary();
@@ -115,7 +115,7 @@ export default function ExpenseSummaryScreen() {
               <Card
                 key={item.vehicleId}
                 style={styles.vehicleRow}
-                onPress={() => router.push(`/vehicles/${item.vehicleId}/maintenance`)}
+                onPress={() => navigateTo(`/vehicles/${item.vehicleId}/maintenance`)}
                 mode="elevated">
                 <Card.Content style={styles.vehicleRowContent}>
                   <IconCircle

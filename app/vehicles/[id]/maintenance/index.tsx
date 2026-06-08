@@ -1,21 +1,25 @@
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { FlatList, StyleSheet } from 'react-native';
 import { PrimaryFab } from '@/components/PrimaryFab';
 import { ThemedScreen } from '@/components/ThemedScreen';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
 import { MaintenanceCard } from '@/components/MaintenanceCard';
+import { AddMaintenanceSheet } from '@/components/sheets/AddMaintenanceSheet';
 import { useFabLayout } from '@/hooks/useFabLayout';
+import { useFormSheet } from '@/hooks/useFormSheet';
 import { useMaintenanceRecords } from '@/hooks/useMaintenanceRecords';
 import { useVehicle } from '@/hooks/useVehicle';
 import { t } from '@/lib/i18n';
+import { useAppNavigation } from '@/lib/navigation';
 
 export default function MaintenanceHistoryScreen() {
-  const router = useRouter();
+  const { navigateTo } = useAppNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { vehicle, isLoading: vehicleLoading, error: vehicleError } = useVehicle(id);
-  const { records, isLoading: recordsLoading, error: recordsError } =
+  const { records, isLoading: recordsLoading, error: recordsError, reload } =
     useMaintenanceRecords(id);
+  const addMaintenanceSheet = useFormSheet();
   const { fabStyle, listPaddingBottom } = useFabLayout();
 
   const isLoading = vehicleLoading || recordsLoading;
@@ -57,7 +61,7 @@ export default function MaintenanceHistoryScreen() {
             <MaintenanceCard
               record={item}
               onPress={() =>
-                router.push(`/vehicles/${vehicle.id}/maintenance/${item.id}/edit`)
+                navigateTo(`/vehicles/${vehicle.id}/maintenance/${item.id}/edit`)
               }
             />
           )}
@@ -74,8 +78,17 @@ export default function MaintenanceHistoryScreen() {
         <PrimaryFab
           icon="plus"
           style={fabStyle}
-          onPress={() => router.push(`/vehicles/${vehicle.id}/maintenance/add`)}
+          onPress={addMaintenanceSheet.open}
           label={t('addMaintenance')}
+        />
+
+        <AddMaintenanceSheet
+          visible={addMaintenanceSheet.visible}
+          formKey={addMaintenanceSheet.formKey}
+          vehicleId={vehicle.id}
+          currentMileage={vehicle.currentMileage}
+          onDismiss={addMaintenanceSheet.close}
+          onSaved={() => void reload()}
         />
       </ThemedScreen>
     </>

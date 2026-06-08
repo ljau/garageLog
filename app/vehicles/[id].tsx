@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Card, Snackbar, Text, useTheme } from 'react-native-paper';
@@ -9,23 +9,29 @@ import { DetailInfoRow } from '@/components/DetailInfoRow';
 import { IconCircle, type MciIconName } from '@/components/IconCircle';
 import { MutedText } from '@/components/MutedText';
 import { QuickActionTile } from '@/components/QuickActionTile';
+import { AddMaintenanceSheet } from '@/components/sheets/AddMaintenanceSheet';
+import { AddReminderSheet } from '@/components/sheets/AddReminderSheet';
 import { ScreenBottomActions } from '@/components/ScreenBottomActions';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
 import { deleteVehicle } from '@/database/vehicleRepository';
+import { useFormSheet } from '@/hooks/useFormSheet';
 import { useVehicle } from '@/hooks/useVehicle';
 import { formatDate, formatMileage, formatVehicleDisplayName, formatVehicleTitle } from '@/lib/format';
 import { t } from '@/lib/i18n';
+import { useAppNavigation } from '@/lib/navigation';
 import { vehicleCategoryIcon, vehicleCategoryLabel } from '@/lib/vehicles';
 import { useDatabase } from '@/providers/DatabaseProvider';
 import { screenScrollContentStyle } from '@/constants/screen';
 
 export default function VehicleDetailScreen() {
   const theme = useTheme();
-  const router = useRouter();
+  const { navigateTo, replaceTo } = useAppNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { refresh, isReady } = useDatabase();
-  const { vehicle, isLoading, error } = useVehicle(id);
+  const { vehicle, isLoading, error, reload } = useVehicle(id);
+  const addMaintenanceSheet = useFormSheet();
+  const addReminderSheet = useFormSheet();
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -44,7 +50,7 @@ export default function VehicleDetailScreen() {
       refresh();
       setDeleteDialogVisible(false);
       setSnackbarVisible(true);
-      setTimeout(() => router.replace('/(tabs)/vehicles'), 600);
+      setTimeout(() => replaceTo('/vehicles'), 600);
     } catch (err) {
       setDeleteError(err instanceof Error ? err.message : t('databaseError'));
     } finally {
@@ -137,17 +143,17 @@ export default function VehicleDetailScreen() {
             <QuickActionTile
               icon="wrench"
               label={t('viewMaintenanceHistory')}
-              onPress={() => router.push(`/vehicles/${vehicle.id}/maintenance`)}
+              onPress={() => navigateTo(`/vehicles/${vehicle.id}/maintenance`)}
             />
             <QuickActionTile
               icon="bell-outline"
               label={t('viewReminders')}
-              onPress={() => router.push(`/vehicles/${vehicle.id}/reminders`)}
+              onPress={() => navigateTo(`/vehicles/${vehicle.id}/reminders`)}
             />
             <QuickActionTile
               icon="pencil-outline"
               label={t('edit')}
-              onPress={() => router.push(`/vehicles/${vehicle.id}/edit`)}
+              onPress={() => navigateTo(`/vehicles/${vehicle.id}/edit`)}
             />
             <QuickActionTile
               icon="delete-outline"
@@ -162,13 +168,13 @@ export default function VehicleDetailScreen() {
           <Button
             mode="contained"
             icon="wrench"
-            onPress={() => router.push(`/vehicles/${vehicle.id}/maintenance/add`)}>
+            onPress={addMaintenanceSheet.open}>
             {t('addMaintenance')}
           </Button>
           <Button
             mode="contained-tonal"
             icon="bell-plus-outline"
-            onPress={() => router.push(`/vehicles/${vehicle.id}/reminders/add`)}>
+            onPress={addReminderSheet.open}>
             {t('addReminder')}
           </Button>
 
@@ -190,6 +196,23 @@ export default function VehicleDetailScreen() {
             setDeleteDialogVisible(false);
           }
         }}
+      />
+
+      <AddMaintenanceSheet
+        visible={addMaintenanceSheet.visible}
+        formKey={addMaintenanceSheet.formKey}
+        vehicleId={vehicle.id}
+        currentMileage={vehicle.currentMileage}
+        onDismiss={addMaintenanceSheet.close}
+        onSaved={() => void reload()}
+      />
+
+      <AddReminderSheet
+        visible={addReminderSheet.visible}
+        formKey={addReminderSheet.formKey}
+        vehicleId={vehicle.id}
+        onDismiss={addReminderSheet.close}
+        onSaved={() => void reload()}
       />
 
       <Snackbar visible={snackbarVisible} onDismiss={() => setSnackbarVisible(false)}>

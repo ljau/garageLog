@@ -1,12 +1,13 @@
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 
+import { navigateToRoute } from '@/lib/navigation';
 import { areLocalNotificationsAvailable, loadNotificationsModule } from '@/lib/notificationsModule';
 
 function redirectFromNotificationUrl(data: Record<string, unknown> | undefined): void {
   const url = data?.url;
   if (typeof url === 'string') {
-    router.push(url as Parameters<typeof router.push>[0]);
+    navigateToRoute(url as Parameters<typeof router.navigate>[0]);
   }
 }
 

@@ -2,6 +2,7 @@ import * as Crypto from 'expo-crypto';
 import dayjs from 'dayjs';
 
 import { getDatabase } from '@/database/db';
+import { recalculateVehicleCurrentMileage } from '@/database/mileageSync';
 import { rowToVehicle, type Vehicle, type VehicleRow } from '@/models/vehicle';
 import type { VehicleFormValues } from '@/schemas/vehicleForm';
 
@@ -17,32 +18,35 @@ export async function insertVehicle(input: VehicleFormValues): Promise<Vehicle> 
   const nickname = input.nickname?.trim() || '';
   const plateNumber = input.plateNumber?.trim() || null;
 
-  await db.runAsync(
-    `INSERT INTO vehicles (
-      id, nickname, brand, model, year, category, plate_number, current_mileage, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  await db.withExclusiveTransactionAsync(async (txn) => {
+    await txn.runAsync(
+      `INSERT INTO vehicles (
+        id, nickname, brand, model, year, category, plate_number, current_mileage, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      id,
+      nickname,
+      input.brand.trim(),
+      input.model.trim(),
+      input.year,
+      input.category,
+      plateNumber,
+      input.currentMileage,
+      createdAt,
+    );
+
+    await recalculateVehicleCurrentMileage(id, txn, input.currentMileage);
+  });
+
+  const row = await db.getFirstAsync<VehicleRow>(
+    `SELECT * FROM vehicles WHERE id = ?`,
     id,
-    nickname,
-    input.brand.trim(),
-    input.model.trim(),
-    input.year,
-    input.category,
-    plateNumber,
-    input.currentMileage,
-    createdAt,
   );
 
-  return {
-    id,
-    nickname,
-    brand: input.brand.trim(),
-    model: input.model.trim(),
-    year: input.year,
-    category: input.category,
-    plateNumber: plateNumber ?? undefined,
-    currentMileage: input.currentMileage,
-    createdAt,
-  };
+  if (!row) {
+    throw new Error('Vehicle not found');
+  }
+
+  return rowToVehicle(row);
 }
 
 export async function getVehicleById(id: string): Promise<Vehicle | null> {
@@ -79,29 +83,33 @@ export async function updateVehicle(
   const nickname = input.nickname?.trim() || '';
   const plateNumber = input.plateNumber?.trim() || null;
 
-  const result = await db.runAsync(
-    `UPDATE vehicles SET
-      nickname = ?,
-      brand = ?,
-      model = ?,
-      year = ?,
-      category = ?,
-      plate_number = ?,
-      current_mileage = ?
-    WHERE id = ?`,
-    nickname,
-    input.brand.trim(),
-    input.model.trim(),
-    input.year,
-    input.category,
-    plateNumber,
-    input.currentMileage,
-    id,
-  );
+  await db.withExclusiveTransactionAsync(async (txn) => {
+    const result = await txn.runAsync(
+      `UPDATE vehicles SET
+        nickname = ?,
+        brand = ?,
+        model = ?,
+        year = ?,
+        category = ?,
+        plate_number = ?,
+        current_mileage = ?
+      WHERE id = ?`,
+      nickname,
+      input.brand.trim(),
+      input.model.trim(),
+      input.year,
+      input.category,
+      plateNumber,
+      input.currentMileage,
+      id,
+    );
 
-  if (result.changes === 0) {
-    throw new Error('Vehicle not found');
-  }
+    if (result.changes === 0) {
+      throw new Error('Vehicle not found');
+    }
+
+    await recalculateVehicleCurrentMileage(id, txn, input.currentMileage);
+  });
 
   const row = await db.getFirstAsync<VehicleRow>(
     `SELECT * FROM vehicles WHERE id = ?`,

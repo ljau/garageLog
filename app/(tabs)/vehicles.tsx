@@ -1,19 +1,22 @@
-import { useRouter } from 'expo-router';
 import { FlatList, StyleSheet } from 'react-native';
 import { PrimaryFab } from '@/components/PrimaryFab';
 import { ThemedScreen } from '@/components/ThemedScreen';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
+import { AddVehicleSheet } from '@/components/sheets/AddVehicleSheet';
 import { VehicleCard } from '@/components/VehicleCard';
 import { useFabLayout } from '@/hooks/useFabLayout';
+import { useFormSheet } from '@/hooks/useFormSheet';
 import { useVehicles } from '@/hooks/useVehicles';
 import { t } from '@/lib/i18n';
+import { useAppNavigation } from '@/lib/navigation';
 import { useDatabase } from '@/providers/DatabaseProvider';
 
 export default function VehiclesScreen() {
-  const router = useRouter();
+  const { navigateTo } = useAppNavigation();
+  const addVehicleSheet = useFormSheet();
   const { status } = useDatabase();
-  const { vehicles, isLoading, error } = useVehicles();
+  const { vehicles, isLoading, error, reload } = useVehicles();
   const { fabStyle, listPaddingBottom } = useFabLayout({ aboveTabBar: true });
 
   if (status === 'loading' || isLoading) {
@@ -43,7 +46,7 @@ export default function VehiclesScreen() {
         renderItem={({ item }) => (
           <VehicleCard
             vehicle={item}
-            onPress={() => router.push(`/vehicles/${item.id}`)}
+            onPress={() => navigateTo(`/vehicles/${item.id}`)}
           />
         )}
         ListEmptyComponent={
@@ -58,8 +61,15 @@ export default function VehiclesScreen() {
       <PrimaryFab
         icon="plus"
         style={fabStyle}
-        onPress={() => router.push('/vehicles/add')}
+        onPress={addVehicleSheet.open}
         label={t('addVehicle')}
+      />
+
+      <AddVehicleSheet
+        visible={addVehicleSheet.visible}
+        formKey={addVehicleSheet.formKey}
+        onDismiss={addVehicleSheet.close}
+        onSaved={() => void reload()}
       />
     </ThemedScreen>
   );

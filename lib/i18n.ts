@@ -1,6 +1,5 @@
 const en = {
   appName: 'GarageLog',
-  dashboardTagline: 'Track vehicles, maintenance, and reminders in one place.',
   dashboard: 'Dashboard',
   vehicles: 'Vehicles',
   addVehicle: 'Add Vehicle',
@@ -8,8 +7,6 @@ const en = {
   averageMileage: 'Average mileage',
   nextUp: 'Next up',
   noUpcomingReminders: 'Nothing due soon',
-  noUpcomingRemindersDescription:
-    'Schedule oil changes, insurance renewals, or tire rotations to see them here.',
   reminderDueInDays: 'in {count} days',
   reminderDueToday: 'today',
   reminderDueTomorrow: 'tomorrow',

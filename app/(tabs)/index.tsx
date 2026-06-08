@@ -1,10 +1,9 @@
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-paper';
 
 import { screenScrollContentStyle } from '@/constants/screen';
-import { DashboardHero } from '@/components/DashboardHero';
 import { EmptyState } from '@/components/EmptyState';
 import { NextUpSection } from '@/components/NextUpSection';
 import { ScreenBottomActions } from '@/components/ScreenBottomActions';
@@ -12,17 +11,21 @@ import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedScreen } from '@/components/ThemedScreen';
 import { LoadingState } from '@/components/LoadingState';
 import { StatCard } from '@/components/StatCard';
+import { AddVehicleSheet } from '@/components/sheets/AddVehicleSheet';
 import { VehicleCard } from '@/components/VehicleCard';
 import type { DashboardReminder } from '@/database/reminderRepository';
 import { getVehicleStats } from '@/database/vehicleRepository';
 import { useDashboardReminders } from '@/hooks/useDashboardReminders';
+import { useFormSheet } from '@/hooks/useFormSheet';
 import { useRecentVehicles } from '@/hooks/useVehicles';
 import { formatMileage } from '@/lib/format';
 import { t } from '@/lib/i18n';
+import { useAppNavigation } from '@/lib/navigation';
 import { useDatabase } from '@/providers/DatabaseProvider';
 
 export default function DashboardScreen() {
-  const router = useRouter();
+  const { navigateTo } = useAppNavigation();
+  const addVehicleSheet = useFormSheet();
   const { isReady, status, error: dbError } = useDatabase();
   const { vehicles, isLoading, error, reload } = useRecentVehicles(3);
   const {
@@ -54,18 +57,17 @@ export default function DashboardScreen() {
     }, [isReady, reload, loadStats, reloadReminders]),
   );
 
-  const goToAddVehicle = () => router.push('/vehicles/add');
-  const goToVehicles = () => router.push('/(tabs)/vehicles');
+  const goToVehicles = () => navigateTo('/vehicles');
   const goToAverageMileage = () => {
     if (vehicles.length === 1) {
-      router.push(`/vehicles/${vehicles[0].id}`);
+      navigateTo(`/vehicles/${vehicles[0].id}`);
       return;
     }
 
     goToVehicles();
   };
   const goToReminder = (reminder: DashboardReminder) =>
-    router.push(`/vehicles/${reminder.vehicleId}/reminders/${reminder.id}/edit`);
+    navigateTo(`/vehicles/${reminder.vehicleId}/reminders/${reminder.id}/edit`);
 
   if (
     status === 'loading' ||
@@ -99,8 +101,6 @@ export default function DashboardScreen() {
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={screenScrollContentStyle}>
-        <DashboardHero />
-
         <View style={styles.statsRow}>
           <StatCard
             label={t('totalVehicles')}
@@ -146,17 +146,27 @@ export default function DashboardScreen() {
             <VehicleCard
               key={vehicle.id}
               vehicle={vehicle}
-              onPress={() => router.push(`/vehicles/${vehicle.id}`)}
+              onPress={() => navigateTo(`/vehicles/${vehicle.id}`)}
             />
           ))
         )}
       </ScrollView>
 
       <ScreenBottomActions>
-        <Button mode="contained" icon="plus" onPress={goToAddVehicle}>
+        <Button mode="contained" icon="plus" onPress={addVehicleSheet.open}>
           {t('addVehicle')}
         </Button>
       </ScreenBottomActions>
+
+      <AddVehicleSheet
+        visible={addVehicleSheet.visible}
+        formKey={addVehicleSheet.formKey}
+        onDismiss={addVehicleSheet.close}
+        onSaved={() => {
+          void reload();
+          void loadStats();
+        }}
+      />
     </ThemedScreen>
   );
 }

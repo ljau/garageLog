@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 import { useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppHeaderBack } from '@/components/AppHeaderBack';
 import { getTabScreenOptions, TAB_BAR_HEIGHT } from '@/constants/screen';
 import { t } from '@/lib/i18n';
 
@@ -16,6 +17,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: true,
         ...tabOptions,
+        headerLeft: () => <AppHeaderBack />,
         tabBarStyle: {
           ...tabOptions.tabBarStyle,
           height: TAB_BAR_HEIGHT + insets.bottom,

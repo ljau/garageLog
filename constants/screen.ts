@@ -20,6 +20,8 @@ export function getHeaderScreenOptions(theme: MD3Theme) {
     headerTintColor: theme.colors.onSurface,
     headerTitleStyle: { color: theme.colors.onSurface },
     headerShadowVisible: false,
+    headerTitleAlign: 'center' as const,
+    headerBackTitleVisible: false,
   } as const;
 }
 

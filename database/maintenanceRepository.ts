@@ -3,6 +3,10 @@ import dayjs from 'dayjs';
 
 import { getDatabase } from '@/database/db';
 import {
+  maybeBumpVehicleMileage,
+  recalculateVehicleCurrentMileage,
+} from '@/database/mileageSync';
+import {
   rowToMaintenanceRecord,
   type MaintenanceRecord,
   type MaintenanceRecordRow,
@@ -19,20 +23,24 @@ export async function insertMaintenanceRecord(
   const notes = input.notes?.trim() || null;
   const cost = input.cost ?? null;
 
-  await db.runAsync(
-    `INSERT INTO maintenance_records (
-      id, vehicle_id, type, description, cost, mileage, service_date, notes, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    id,
-    vehicleId,
-    input.type.trim(),
-    input.description.trim(),
-    cost,
-    input.mileage,
-    input.serviceDate,
-    notes,
-    createdAt,
-  );
+  await db.withExclusiveTransactionAsync(async (txn) => {
+    await txn.runAsync(
+      `INSERT INTO maintenance_records (
+        id, vehicle_id, type, description, cost, mileage, service_date, notes, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      id,
+      vehicleId,
+      input.type.trim(),
+      input.description.trim(),
+      cost,
+      input.mileage,
+      input.serviceDate,
+      notes,
+      createdAt,
+    );
+
+    await maybeBumpVehicleMileage(vehicleId, input.mileage, txn);
+  });
 
   return {
     id,
@@ -77,27 +85,40 @@ export async function updateMaintenanceRecord(
   const notes = input.notes?.trim() || null;
   const cost = input.cost ?? null;
 
-  const result = await db.runAsync(
-    `UPDATE maintenance_records SET
-      type = ?,
-      description = ?,
-      cost = ?,
-      mileage = ?,
-      service_date = ?,
-      notes = ?
-    WHERE id = ?`,
-    input.type.trim(),
-    input.description.trim(),
-    cost,
-    input.mileage,
-    input.serviceDate,
-    notes,
+  const existing = await db.getFirstAsync<MaintenanceRecordRow>(
+    `SELECT * FROM maintenance_records WHERE id = ?`,
     id,
   );
 
-  if (result.changes === 0) {
+  if (!existing) {
     throw new Error('Maintenance record not found');
   }
+
+  await db.withExclusiveTransactionAsync(async (txn) => {
+    const result = await txn.runAsync(
+      `UPDATE maintenance_records SET
+        type = ?,
+        description = ?,
+        cost = ?,
+        mileage = ?,
+        service_date = ?,
+        notes = ?
+      WHERE id = ?`,
+      input.type.trim(),
+      input.description.trim(),
+      cost,
+      input.mileage,
+      input.serviceDate,
+      notes,
+      id,
+    );
+
+    if (result.changes === 0) {
+      throw new Error('Maintenance record not found');
+    }
+
+    await recalculateVehicleCurrentMileage(existing.vehicle_id, txn);
+  });
 
   const row = await db.getFirstAsync<MaintenanceRecordRow>(
     `SELECT * FROM maintenance_records WHERE id = ?`,
@@ -113,12 +134,26 @@ export async function updateMaintenanceRecord(
 
 export async function deleteMaintenanceRecord(id: string): Promise<void> {
   const db = await getDatabase();
-  const result = await db.runAsync(
-    `DELETE FROM maintenance_records WHERE id = ?`,
+
+  const existing = await db.getFirstAsync<MaintenanceRecordRow>(
+    `SELECT * FROM maintenance_records WHERE id = ?`,
     id,
   );
 
-  if (result.changes === 0) {
+  if (!existing) {
     throw new Error('Maintenance record not found');
   }
+
+  await db.withExclusiveTransactionAsync(async (txn) => {
+    const result = await txn.runAsync(
+      `DELETE FROM maintenance_records WHERE id = ?`,
+      id,
+    );
+
+    if (result.changes === 0) {
+      throw new Error('Maintenance record not found');
+    }
+
+    await recalculateVehicleCurrentMileage(existing.vehicle_id, txn);
+  });
 }
